@@ -10,7 +10,7 @@ jobs:
       mysql:
         image: mysql:latest
         env:
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD  }}
           MYSQL_DATABASE: food_58
         ports:
           - 3306:3306
@@ -28,7 +28,7 @@ jobs:
 
       - name: Executar testes unitários
         run: |
-          export MYSQL_PASSWORD=root
+          export MYSQL_PASSWORD="${{ secrets.MYSQL_PASSWORD }}"
           mvn test
 
       - name: Generate JaCoco Badge
@@ -54,7 +54,7 @@ jobs:
       mysql:
         image: mysql:latest
         env:
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD  }}
           MYSQL_DATABASE: food_58
         ports:
           - 3306:3306
@@ -73,7 +73,7 @@ jobs:
 
       - name: Build com Maven
         run: |
-          export MYSQL_PASSWORD=root
+          export MYSQL_PASSWORD="${{ secrets.MYSQL_PASSWORD }}"
           mvn package
 
 
@@ -89,8 +89,8 @@ jobs:
       mysql:
         image: mysql:latest
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: gerenciamento_servicos
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD  }}
+          MYSQL_DATABASE: food_58
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -106,7 +106,7 @@ jobs:
           package: '*.jar'
       - name: Publish package
         run: |
-          export MYSQL_PASSWORD=root
+          export MYSQL_PASSWORD="${{ secrets.MYSQL_PASSWORD }}"
           mvn --batch-mode deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
