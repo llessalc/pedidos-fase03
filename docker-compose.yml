@@ -9,8 +9,6 @@ services:
     environment:
       MYSQL_DATABASE: food_58
       MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD  }}
-    secrets:
-      - db_pass
 
   pedidos_service:
     build: .
@@ -26,8 +24,6 @@ services:
       MYSQL_USER: root
       MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD  }}
       MYSQL_DB: food_58
-    secrets:
-      - db_pass
     working_dir: /usr/src/pedidos
     command: /usr/src/pedidos/app-startup.sh
 
