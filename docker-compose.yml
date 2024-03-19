@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+  mysqldb:
+    container_name: mysqldb_pedidos
+    image: mysql:8.0
+    restart: always
+    networks:
+      - pedidos-net
+    environment:
+      MYSQL_DATABASE: food_58
+      MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_PASSWORD  }}
+
+  pedidos_service:
+    build: .
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - pedidos-net
+    depends_on:
+      - mysqldb
+    environment:
+      MYSQL_HOST: mysqldb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD  }}
+      MYSQL_DB: food_58
+    working_dir: /usr/src/pedidos
+    command: /usr/src/pedidos/app-startup.sh
+
+networks:
+  pedidos-net:
+    driver: bridge
