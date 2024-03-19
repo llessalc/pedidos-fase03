@@ -26,10 +26,13 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
 
+      - name: Configurar variáveis de ambiente
+        run: |
+          echo "MYSQL_HOST=localhost" >> $GITHUB_ENV
+          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> $GITHUB_ENV
+
       - name: Executar testes unitários
         run: |
-          export MYSQL_PASSWORD="${{ secrets.MYSQL_PASSWORD }}"
-          export MYSQL_HOST="localhost"
           mvn test
 
       - name: Generate JaCoco Badge
