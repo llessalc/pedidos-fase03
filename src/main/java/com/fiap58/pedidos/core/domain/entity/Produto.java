@@ -1,6 +1,5 @@
 package com.fiap58.pedidos.core.domain.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -9,16 +8,16 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Optional;
 
-@JsonIgnoreProperties({"categoria"})
+@JsonIgnoreProperties({ "categoria" })
 @Entity
 @Table(name = "Produtos")
 @Getter
 @Setter
 public class Produto {
 
-    public Produto(){};
+    public Produto() {
+    };
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,9 +55,8 @@ public class Produto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
     private Instant deletadoEm;
 
-
-    public Produto(String nome,  String descricao, BigDecimal precoAtual) {
-        //this.idProduto = 2L;
+    public Produto(String nome, String descricao, BigDecimal precoAtual) {
+        // this.idProduto = 2L;
         this.nome = nome;
         this.descricao = descricao;
         this.precoAtual = precoAtual;
@@ -67,21 +65,23 @@ public class Produto {
     }
 
     // Getters and Setters
-    public void setCategoria(Categoria categoria){
+    public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
 
-    public void setNome(String nome){
+    public void setNome(String nome) {
         this.nome = nome;
     }
 
-    public String getNome(){
+    public String getNome() {
         return this.nome;
     }
-    public void setPrecoAtual(BigDecimal precoAtual){
+
+    public void setPrecoAtual(BigDecimal precoAtual) {
         this.precoAtual = precoAtual;
     }
-    public BigDecimal getPrecoAtual(){
+
+    public BigDecimal getPrecoAtual() {
         return this.precoAtual;
     }
 }

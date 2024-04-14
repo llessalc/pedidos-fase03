@@ -1,7 +1,6 @@
 package com.fiap58.pedidos.gateway.impl;
 
 import com.fiap58.pedidos.gateway.ConsumerApiPagamentos;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 

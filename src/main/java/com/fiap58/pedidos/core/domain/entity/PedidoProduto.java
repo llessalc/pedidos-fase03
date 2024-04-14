@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "Pedido_Produto")
@@ -38,7 +36,5 @@ public class PedidoProduto {
 
     @Column(name = "OBSERVACAO", length = 200)
     private String observacao;
-
-
 
 }

@@ -2,7 +2,6 @@ package com.fiap58.pedidos.controller;
 
 import com.fiap58.pedidos.presenters.dto.entrada.DadosProdutoDtoEntrada;
 import com.fiap58.pedidos.presenters.dto.saida.DadosProdutoDto;
-import com.fiap58.pedidos.core.domain.entity.Produto;
 import com.fiap58.pedidos.core.usecase.ProdutoService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
@@ -28,7 +27,7 @@ public class ProdutoController {
 
     @Operation(description = "Lista todos os produtos disponíveis")
     @GetMapping("/list")
-    public List<DadosProdutoDto> listarProdutos(){
+    public List<DadosProdutoDto> listarProdutos() {
         return service.retornaListaProdutos();
     }
 
@@ -63,7 +62,5 @@ public class ProdutoController {
 
         service.deleteProduto(id);
     }
-
-
 
 }
