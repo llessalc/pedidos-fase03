@@ -1,1 +1,1 @@
-alter table pedidos add COLUMN ESTIMATIVA_PREPARO TIMESTAMP;
+alter table Pedidos add COLUMN ESTIMATIVA_PREPARO TIMESTAMP;
