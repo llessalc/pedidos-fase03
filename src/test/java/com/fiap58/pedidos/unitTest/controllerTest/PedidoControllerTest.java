@@ -1,4 +1,4 @@
-package com.fiap58.pedidos.controllerTest;
+package com.fiap58.pedidos.unitTest.controllerTest;
 
 import com.fiap58.pedidos.core.usecase.PedidoService;
 import org.junit.jupiter.api.Test;
