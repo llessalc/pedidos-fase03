@@ -9,10 +9,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/pedidos")
@@ -21,11 +23,26 @@ public class PedidoController {
     @Autowired
     private PedidoService service;
 
+    public PedidoController(PedidoService _pedidoService) {
+        this.service = _pedidoService;
+    }
+
     @Operation(description = "Lista todos os pedidos")
     @GetMapping
-    public ResponseEntity<List<DadosPedidosPainelDto>> listarPedidos(){
-        List<DadosPedidosPainelDto> pedidos = service.listarPedidos();
-        return ResponseEntity.ok(pedidos);
+    public ResponseEntity<List<DadosPedidosPainelDto>> listarPedidos() {
+        try {
+            List<DadosPedidosPainelDto> pedidos = service.listarPedidos();
+
+            if (pedidos.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+
+            return new ResponseEntity<List<DadosPedidosPainelDto>>(pedidos, HttpStatus.OK);
+        } catch (Exception e) {
+            // Log the exception message and return a ResponseEntity with a custom error message
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
     }
 
     @Operation(description = "Inicia Checkout")
