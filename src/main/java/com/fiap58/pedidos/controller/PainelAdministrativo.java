@@ -1,7 +1,7 @@
 package com.fiap58.pedidos.controller;
 
 import com.fiap58.pedidos.core.domain.entity.Pedido;
-import com.fiap58.pedidos.core.usecase.PedidoService;
+import com.fiap58.pedidos.core.usecase.IPedidoService;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosDto;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosPainelDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class PainelAdministrativo {
 
     @Autowired
-    private PedidoService service;
+    private IPedidoService service;
 
     @Operation(description = "Atualiza o status do pedido")
     @PatchMapping("/atualizar/{id}")

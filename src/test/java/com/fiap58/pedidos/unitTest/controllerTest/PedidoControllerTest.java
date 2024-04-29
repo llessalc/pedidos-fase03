@@ -1,6 +1,7 @@
 package com.fiap58.pedidos.unitTest.controllerTest;
 
 import com.fiap58.pedidos.controller.PedidoController;
+import com.fiap58.pedidos.core.usecase.IPedidoService;
 import com.fiap58.pedidos.core.usecase.PedidoService;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosPainelDto;
 
@@ -30,26 +31,24 @@ public class PedidoControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private PedidoService pedidoService;
-
+    private IPedidoService pedidoService;
 
     @BeforeEach
     public void setup() {
         // Mock the service
- 
+
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
     public void listarPedidosTest_VariosItensNaLista() throws Exception {
 
-        PedidoService pedidoService = Mockito.mock(PedidoService.class);
+        IPedidoService pedidoService = Mockito.mock(PedidoService.class);
         mockMvc = MockMvcBuilders.standaloneSetup(new PedidoController(pedidoService)).build();
         // Mock the service response
         List<DadosPedidosPainelDto> pedidos = Arrays.asList(
                 new DadosPedidosPainelDto(),
-                new DadosPedidosPainelDto()
-        );
+                new DadosPedidosPainelDto());
         Mockito.when(pedidoService.listarPedidos()).thenReturn(pedidos);
 
         // Perform the request and assert the response
@@ -59,30 +58,30 @@ public class PedidoControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(pedidos.size()));
     }
 
-@Test
-public void listarPedidosTest_ComUmPedido() throws Exception {
-    // Create a pedido
-    DadosPedidosPainelDto pedido = new DadosPedidosPainelDto();
-    // Set the properties of the pedido...
+    @Test
+    public void listarPedidosTest_ComUmPedido() throws Exception {
+        // Create a pedido
+        DadosPedidosPainelDto pedido = new DadosPedidosPainelDto();
+        // Set the properties of the pedido...
 
-    PedidoService pedidoService = Mockito.mock(PedidoService.class);
-    mockMvc = MockMvcBuilders.standaloneSetup(new PedidoController(pedidoService)).build();
+        IPedidoService pedidoService = Mockito.mock(PedidoService.class);
+        mockMvc = MockMvcBuilders.standaloneSetup(new PedidoController(pedidoService)).build();
 
-    // Configure the mock to return a list with one pedido
-    Mockito.when(pedidoService.listarPedidos()).thenReturn(Arrays.asList(pedido));
+        // Configure the mock to return a list with one pedido
+        Mockito.when(pedidoService.listarPedidos()).thenReturn(Arrays.asList(pedido));
 
-    // Perform the request and assert the response
-    mockMvc.perform(MockMvcRequestBuilders.get("/pedidos"))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)));
-}
+        // Perform the request and assert the response
+        mockMvc.perform(MockMvcRequestBuilders.get("/pedidos"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)));
+    }
 
     @Test
     public void listarPedidosTest_ComListaEmBranco() throws Exception {
 
-        PedidoService pedidoService = Mockito.mock(PedidoService.class);
+        IPedidoService pedidoService = Mockito.mock(PedidoService.class);
         mockMvc = MockMvcBuilders.standaloneSetup(new PedidoController(pedidoService)).build();
-        
+
         Mockito.when(pedidoService.listarPedidos()).thenReturn(Collections.emptyList());
 
         // Perform the request and assert the response
@@ -92,7 +91,7 @@ public void listarPedidosTest_ComUmPedido() throws Exception {
 
     @Test
     public void listarPedidosTest_ComException() throws Exception {
-        PedidoService pedidoService = Mockito.mock(PedidoService.class);
+        IPedidoService pedidoService = Mockito.mock(PedidoService.class);
         mockMvc = MockMvcBuilders.standaloneSetup(new PedidoController(pedidoService)).build();
 
         // Mock the service to throw an exception

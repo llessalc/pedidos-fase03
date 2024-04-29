@@ -1,8 +1,8 @@
 package com.fiap58.pedidos.controller;
 
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosDto;
+import com.fiap58.pedidos.core.usecase.IPedidoService;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosPedidosEntrada;
-import com.fiap58.pedidos.core.usecase.PedidoService;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosPainelDto;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosValorDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,16 +15,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/pedidos")
 public class PedidoController {
 
     @Autowired
-    private PedidoService service;
+    private IPedidoService service;
 
-    public PedidoController(PedidoService _pedidoService) {
-        this.service = _pedidoService;
+    public PedidoController(IPedidoService _iPedidoService) {
+        this.service = _iPedidoService;
     }
 
     @Operation(description = "Lista todos os pedidos")
@@ -39,7 +38,8 @@ public class PedidoController {
 
             return new ResponseEntity<List<DadosPedidosPainelDto>>(pedidos, HttpStatus.OK);
         } catch (Exception e) {
-            // Log the exception message and return a ResponseEntity with a custom error message
+            // Log the exception message and return a ResponseEntity with a custom error
+            // message
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
         }
@@ -47,7 +47,7 @@ public class PedidoController {
 
     @Operation(description = "Inicia Checkout")
     @PostMapping("/checkout")
-    public ResponseEntity<Long> incluirPedido(@RequestBody @Valid DadosPedidosEntrada dto){
+    public ResponseEntity<Long> incluirPedido(@RequestBody @Valid DadosPedidosEntrada dto) {
         DadosPedidosDto dadosPedidosDto = service.inserirPedidoFila(dto);
 
         return ResponseEntity.ok(dadosPedidosDto.getId());
@@ -62,8 +62,7 @@ public class PedidoController {
 
     @Operation(description = "Lista pedido")
     @GetMapping("/{id}")
-    public ResponseEntity<DadosPedidosValorDto> listarPedido(@PathVariable Long id){
+    public ResponseEntity<DadosPedidosValorDto> listarPedido(@PathVariable Long id) {
         return ResponseEntity.ok(service.buscaPedido(id));
     }
 }
-

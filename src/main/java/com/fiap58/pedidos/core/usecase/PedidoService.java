@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class PedidoService {
+public class PedidoService implements IPedidoService {
 
     @Autowired
     private PedidoRepository repository;
@@ -35,6 +35,7 @@ public class PedidoService {
     private ImplConsumerApiPagamentos consumerApiPagamentos;
 
 
+    @Override
     public DadosPedidosDto inserirPedidoFila(DadosPedidosEntrada dto) {
         Cliente cliente;
         if(dto.clienteId() != null){
@@ -63,6 +64,7 @@ public class PedidoService {
         return pedidosProdutos;
     }
 
+    @Override
     public List<DadosPedidosPainelDto> listarPedidos(){
         List<Pedido> pedidos = this.retornarTodosPedidos();
         List<DadosPedidosPainelDto> dadosPedidosDtos = ordenaDadosPedidoDto(pedidos.stream().map(this::mapperDadosPedidoPainelDto).collect(Collectors.toList()));
@@ -92,15 +94,18 @@ public class PedidoService {
         return repository.findAll();
     }
     
+    @Override
     public Pedido retornaPedido(Long id){
 
         return repository.findById(id).orElseThrow();
     }
 
+    @Override
     public List<PedidoProduto> retornaTabelaJuncao(Pedido pedido){
         return pedidoProdutoService.retornaPedidoProduto(pedido.getIdPedido());
     }
 
+    @Override
     public DadosPedidosDto atualizarPedido(Long id, Boolean pagamentoRealizado) throws Exception {
         Pedido pedido = this.retornaPedido(id);
         if (pedido.getStatus().equals(StatusPedido.RECEBIDO)){
@@ -128,6 +133,7 @@ public class PedidoService {
         throw new Exception("Pagamento não identificado");
     }
 
+    @Override
     public DadosPedidosDto recebePagamento(Long id) throws Exception {
         Pedido pedido = this.retornaPedido(id);
         DadosPedidosDto dadosPedidosDto = null;
@@ -138,6 +144,7 @@ public class PedidoService {
         return dadosPedidosDto;
     }
 
+    @Override
     public DadosPedidosPainelDto defineTempoEspera(Pedido pedido, long tempoEspera){
         Duration duracao = Duration.ofMinutes(tempoEspera);
         pedido.setEstimativaPreparo(pedido.getDataPedido().plus(duracao));
@@ -192,6 +199,7 @@ public class PedidoService {
         return new DadosPedidosValorDto(pedido, produtosDoPedido);
     }
 
+    @Override
     public DadosPedidosValorDto buscaPedido(Long id) {
         return mapperDadosPedidoValor(retornaPedido(id));
     }
