@@ -14,13 +14,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/pedidos")
 public class PedidoController {
 
-    @Autowired
-    private IPedidoService service;
+    private final IPedidoService service;
 
     public PedidoController(IPedidoService _iPedidoService) {
         this.service = _iPedidoService;
@@ -28,7 +29,7 @@ public class PedidoController {
 
     @Operation(description = "Lista todos os pedidos")
     @GetMapping
-    public ResponseEntity<List<DadosPedidosPainelDto>> listarPedidos() {
+    public ResponseEntity<List<DadosPedidosPainelDto>> listartodosPedidos() {
         try {
             List<DadosPedidosPainelDto> pedidos = service.listarPedidos();
 
@@ -57,7 +58,11 @@ public class PedidoController {
     @PostMapping("/confirmacao-pagamento/{id}")
     @Transactional
     public ResponseEntity<DadosPedidosDto> recebePagamento(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(service.recebePagamento(id));
+        return ResponseEntity.ok(processaPagamento(id));
+    }
+
+    private DadosPedidosDto processaPagamento(Long id) throws Exception {
+        return service.recebePagamento(id);
     }
 
     @Operation(description = "Lista pedido")

@@ -21,6 +21,26 @@ public class DadosPedidosDto {
     private Instant dataPedido;
     private StatusPedido status;
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setProdutos(List<ProdutoCarrinhoSaida> produtos) {
+        this.produtos = produtos;
+    }
+
+    public void setNomeCliente(String nomeCliente) {
+        this.nomeCliente = nomeCliente;
+    }
+
+    public void setDataPedido(Instant dataPedido) {
+        this.dataPedido = dataPedido;
+    }
+
+    public void setStatus(StatusPedido status) {
+        this.status = status;
+    }
+
     public DadosPedidosDto(Pedido pedido, List<PedidoProduto> pedidoProdutos) {
         this.id = pedido.getIdPedido();
         this.dataPedido = pedido.getDataPedido();

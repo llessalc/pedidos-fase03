@@ -1,9 +1,11 @@
 package com.fiap58.pedidos.unitTest.controllerTest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap58.pedidos.controller.PedidoController;
 import com.fiap58.pedidos.core.usecase.IPedidoService;
 import com.fiap58.pedidos.core.usecase.PedidoService;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosPainelDto;
+import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosValorDto;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +16,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -22,6 +25,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import static org.mockito.Mockito.when; // Import the necessary class from Mockito library
+import static org.mockito.BDDMockito.given; // Import the necessary class from Mockito library
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath; // Import the necessary class
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -32,6 +40,9 @@ public class PedidoControllerTest {
 
     @Mock
     private IPedidoService pedidoService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     public void setup() {
@@ -101,6 +112,17 @@ public class PedidoControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/pedidos"))
                 .andExpect(MockMvcResultMatchers.status().isInternalServerError());
     }
-    // // Add more test methods for other controller methods
 
+    @Test
+    public void testListarPedido() throws Exception {
+        long id = 1L;
+        DadosPedidosValorDto dto = new DadosPedidosValorDto();
+        dto.setId(id);
+
+        given(pedidoService.buscaPedido(id)).willReturn(dto);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/" + id)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
 }
