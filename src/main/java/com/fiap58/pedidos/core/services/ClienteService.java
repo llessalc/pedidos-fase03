@@ -19,14 +19,18 @@ import java.util.List;
 @Service
 public class ClienteService implements IClienteService {
 
-    @Autowired
-    private ClienteRepository repository;
+    private final ClienteRepository repository;
 
-    @Autowired
-    private IEnderecoService enderecoService;
+    private final IEnderecoService enderecoService;
 
-    @Autowired
-    private ITelefoneService telefoneService;
+    private final ITelefoneService telefoneService;
+
+    public ClienteService(ClienteRepository repository, IEnderecoService enderecoService,
+            ITelefoneService telefoneService) {
+        this.repository = repository;
+        this.enderecoService = enderecoService;
+        this.telefoneService = telefoneService;
+    }
 
     @Override
     public Cliente cadastrarCliente(Cliente cliente) {
@@ -81,10 +85,5 @@ public class ClienteService implements IClienteService {
     private DadosClienteDto mapperClienteDto(Cliente cliente) {
         return new DadosClienteDto(cliente);
     }
-
-    // private List<DadosClienteDto> mapperListClienteDto(List<Cliente> clientes){
-    // return
-    // clientes.stream().map(this::mapperClienteDto).collect(Collectors.toList());
-    // }
 
 }

@@ -1,4 +1,4 @@
-package com.fiap58.pedidos.unitTest.controllerTest;
+package com.fiap58.pedidos.unitTest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap58.pedidos.controller.PedidoController;

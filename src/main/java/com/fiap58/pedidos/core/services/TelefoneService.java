@@ -6,24 +6,27 @@ import com.fiap58.pedidos.core.usecase.ITelefoneService;
 import com.fiap58.pedidos.gateway.TelefoneRepository;
 import com.fiap58.pedidos.presenters.dto.entrada.TelefoneCadastro;
 import com.fiap58.pedidos.presenters.dto.saida.DadosTelefoneDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TelefoneService implements ITelefoneService {
 
-    @Autowired
-    private TelefoneRepository repository;
+    private final TelefoneRepository repository;
 
-    @Override
-    public DadosTelefoneDto cadastrarTelefone(TelefoneCadastro telefoneCadastro, Cliente cliente){
-        Telefone telefone = new Telefone(telefoneCadastro);
-        telefone.setCliente(cliente);
-        Telefone telefoneSalvo = repository.save(telefone);
-        return mapperTelefoneDto(telefoneSalvo);
+    public TelefoneService(TelefoneRepository _repository) {
+        this.repository = _repository;
     }
 
-    private DadosTelefoneDto mapperTelefoneDto(Telefone telefone){
+    @Override
+    public DadosTelefoneDto cadastrarTelefone(TelefoneCadastro telefoneCadastro, Cliente cliente) {
+
+        Telefone telefone = new Telefone(telefoneCadastro);
+        telefone.setCliente(cliente);
+        return mapperTelefoneDto(repository.save(telefone));
+    }
+
+    private DadosTelefoneDto mapperTelefoneDto(Telefone telefone) {
+
         return new DadosTelefoneDto(telefone);
     }
 }
