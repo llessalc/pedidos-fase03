@@ -1,6 +1,6 @@
 package com.fiap58.pedidos.controller;
 
-import com.fiap58.pedidos.core.usecase.CategoriaService;
+import com.fiap58.pedidos.core.usecase.ICategoriaService;
 import com.fiap58.pedidos.presenters.dto.entrada.CategoriaDtoEntrada;
 import com.fiap58.pedidos.presenters.dto.saida.DadosCategoriaDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class CategoriaController {
 
     @Autowired
-    private CategoriaService service;
+    private ICategoriaService service;  
 
     @Operation(description = "Busca categoria por Id")
     @GetMapping("/{id}")

@@ -2,8 +2,8 @@ package com.fiap58.pedidos.unitTest.controllerTest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap58.pedidos.controller.PedidoController;
+import com.fiap58.pedidos.core.services.PedidoService;
 import com.fiap58.pedidos.core.usecase.IPedidoService;
-import com.fiap58.pedidos.core.usecase.PedidoService;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosPainelDto;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosValorDto;
 

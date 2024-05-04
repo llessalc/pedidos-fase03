@@ -1,8 +1,9 @@
 package com.fiap58.pedidos.controller;
 
+import com.fiap58.pedidos.core.usecase.IClienteService;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosClienteCadastro;
 import com.fiap58.pedidos.presenters.dto.saida.DadosClienteDto;
-import com.fiap58.pedidos.core.usecase.ClienteService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ import java.util.List;
 public class ClienteController {
 
     @Autowired
-    private ClienteService service;
+    private IClienteService service;
 
     @Operation(description = "Faz a inserção de um novo cliente")
     @PostMapping("/inserir")

@@ -1,23 +1,27 @@
-package com.fiap58.pedidos.core.usecase;
+package com.fiap58.pedidos.core.services;
 
 import com.fiap58.pedidos.gateway.PedidoProdutoRepository;
 import com.fiap58.pedidos.core.domain.entity.PedidoProduto;
+import com.fiap58.pedidos.core.usecase.IPedidoProdutoService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class pedidoProdutoService {
+public class PedidoProdutoService implements IPedidoProdutoService {
 
     @Autowired
     private PedidoProdutoRepository repository;
 
-    public void inserirPedidoProduto(PedidoProduto pedidoProduto){
+    @Override
+    public void inserirPedidoProduto(PedidoProduto pedidoProduto) {
         repository.save(pedidoProduto);
     }
 
-    public List<PedidoProduto> retornaPedidoProduto(Long id){
+    @Override
+    public List<PedidoProduto> retornaPedidoProduto(Long id) {
         return repository.findAllByIdPedido(id);
     }
 }

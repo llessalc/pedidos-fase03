@@ -1,4 +1,4 @@
-package com.fiap58.pedidos.core.usecase;
+package com.fiap58.pedidos.core.services;
 
 import com.fiap58.pedidos.gateway.ClienteRepository;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosClienteCadastro;
@@ -6,6 +6,10 @@ import com.fiap58.pedidos.presenters.dto.entrada.EnderecoCadastro;
 import com.fiap58.pedidos.presenters.dto.entrada.TelefoneCadastro;
 import com.fiap58.pedidos.presenters.dto.saida.DadosClienteDto;
 import com.fiap58.pedidos.core.domain.entity.Cliente;
+import com.fiap58.pedidos.core.usecase.IClienteService;
+import com.fiap58.pedidos.core.usecase.IEnderecoService;
+import com.fiap58.pedidos.core.usecase.ITelefoneService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,23 +17,25 @@ import java.time.Instant;
 import java.util.List;
 
 @Service
-public class ClienteService {
+public class ClienteService implements IClienteService {
 
     @Autowired
     private ClienteRepository repository;
 
     @Autowired
-    private EnderecoService enderecoService;
+    private IEnderecoService enderecoService;
 
     @Autowired
-    private TelefoneService telefoneService;
+    private ITelefoneService telefoneService;
 
+    @Override
     public Cliente cadastrarCliente(Cliente cliente) {
         cliente.setCriadoEm(Instant.now());
         cliente.setAtualizadoEm(Instant.now());
         return repository.save(cliente);
     }
 
+    @Override
     public DadosClienteDto cadastrarCliente(DadosClienteCadastro dto) {
         if (buscarClientePorCpf(dto.cpf()) == null) {
             Cliente cliente = new Cliente(dto);
@@ -46,22 +52,27 @@ public class ClienteService {
         }
     }
 
+    @Override
     public DadosClienteDto retornaClienteCpf(String cpf) {
         return mapperClienteDto(buscarClientePorCpf(cpf));
     }
 
+    @Override
     public DadosClienteDto retornaClienteId(Long id) {
         return mapperClienteDto(buscarClientePorId(id));
     }
 
+    @Override
     public Cliente buscarClientePorCpf(String cpf) {
         return repository.findByCpf(cpf);
     }
 
+    @Override
     public Cliente buscarClientePorId(Long id) {
         return repository.findById(id).orElse(null);
     }
 
+    @Override
     public List<DadosClienteDto> listarClientes() {
         return repository.findAll().stream().filter(cliente -> cliente.getDeletadoEm() == null)
                 .map(DadosClienteDto::new).toList();

@@ -1,9 +1,12 @@
-package com.fiap58.pedidos.core.usecase;
+package com.fiap58.pedidos.core.services;
 
 import com.fiap58.pedidos.gateway.ProdutoRepository;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosProdutoDtoEntrada;
 import com.fiap58.pedidos.presenters.dto.saida.DadosProdutoDto;
 import com.fiap58.pedidos.core.domain.entity.Produto;
+import com.fiap58.pedidos.core.usecase.ICategoriaService;
+import com.fiap58.pedidos.core.usecase.IProdutoService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,30 +18,35 @@ import java.util.stream.Collectors;
 import static com.fiap58.pedidos.core.specifications.ProdutoSpecification.temCategoria;
 
 @Service
-public class ProdutoService {
+public class ProdutoService implements IProdutoService {
 
     @Autowired
     private ProdutoRepository repository;
 
     @Autowired
-    private CategoriaService categoriaService;
+    private ICategoriaService categoriaService;
 
+    @Override
     public Produto buscarProduto(long id) {
         return repository.getReferenceById(id);
     }
 
+    @Override
     public DadosProdutoDto retornaProduto(long id) {
         return mapperDadosProdutoDto(verificaVigenciaProduto(buscarProduto(id)));
     }
 
+    @Override
     public List<Produto> listarProdutos() {
         return repository.findAll();
     }
 
+    @Override
     public List<DadosProdutoDto> retornaListaProdutos() {
         return mapperListaProdutoDto(produtosVigentes(listarProdutos()));
     }
 
+    @Override
     public List<DadosProdutoDto> retornaListaProdutosCategoria(String nomeCategoria) {
         return mapperListaProdutoDto(produtosVigentes(buscarProdutoPorCategoria(nomeCategoria)));
     }
@@ -48,6 +56,7 @@ public class ProdutoService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public DadosProdutoDto inserirProduto(DadosProdutoDtoEntrada dto) {
         Produto produto = new Produto(dto.nome(), dto.descricao(), dto.precoAtual());
         var categoria = categoriaService.buscarCategoria(dto.idCategoria());
@@ -62,6 +71,7 @@ public class ProdutoService {
         return new DadosProdutoDto(produto);
     }
 
+    @Override
     public void deleteProduto(Long id) {
         Produto produto = buscarProduto(id);
         produto.setAtualizadoEm(Instant.now());
@@ -69,6 +79,7 @@ public class ProdutoService {
         repository.save(produto);
     }
 
+    @Override
     public Produto updateProduto(Long id, DadosProdutoDto dto) {
         // Por enquanto, so atualiza nome e preço.
         Produto produto = buscarProduto(id);

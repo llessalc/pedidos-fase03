@@ -1,8 +1,9 @@
 package com.fiap58.pedidos.controller;
 
+import com.fiap58.pedidos.core.usecase.IProdutoService;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosProdutoDtoEntrada;
 import com.fiap58.pedidos.presenters.dto.saida.DadosProdutoDto;
-import com.fiap58.pedidos.core.usecase.ProdutoService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -17,7 +18,7 @@ import java.util.List;
 public class ProdutoController {
 
     @Autowired
-    private ProdutoService service;
+    private IProdutoService service;
 
     @Operation(description = "Busca produto por Id")
     @GetMapping("/{id}")
