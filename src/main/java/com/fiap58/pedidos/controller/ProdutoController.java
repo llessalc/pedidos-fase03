@@ -7,7 +7,6 @@ import com.fiap58.pedidos.presenters.dto.saida.DadosProdutoDto;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +16,11 @@ import java.util.List;
 @RequestMapping("/produto")
 public class ProdutoController {
 
-    @Autowired
-    private IProdutoService service;
+    private final IProdutoService service;
+
+    public ProdutoController(IProdutoService _service) {
+        this.service = _service;
+    }
 
     @Operation(description = "Busca produto por Id")
     @GetMapping("/{id}")

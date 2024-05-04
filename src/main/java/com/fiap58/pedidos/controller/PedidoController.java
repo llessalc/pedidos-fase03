@@ -8,14 +8,12 @@ import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosValorDto;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import org.springframework.http.ResponseEntity;
-import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/pedidos")
@@ -23,8 +21,8 @@ public class PedidoController {
 
     private final IPedidoService service;
 
-    public PedidoController(IPedidoService _iPedidoService) {
-        this.service = _iPedidoService;
+    public PedidoController(IPedidoService _service) {
+        this.service = _service;
     }
 
     @Operation(description = "Lista todos os pedidos")

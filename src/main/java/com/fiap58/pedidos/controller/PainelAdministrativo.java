@@ -6,7 +6,7 @@ import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosDto;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosPainelDto;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/adm")
 public class PainelAdministrativo {
 
-    @Autowired
-    private IPedidoService service;
+    private final IPedidoService service;
+
+    public PainelAdministrativo(IPedidoService _service) {
+        this.service = _service;
+    }
 
     @Operation(description = "Atualiza o status do pedido")
     @PatchMapping("/atualizar/{id}")
@@ -28,7 +31,7 @@ public class PainelAdministrativo {
     @PostMapping("/define-tempo-espera/{id}")
     @Transactional
     public ResponseEntity<DadosPedidosPainelDto> atualizarTempoEspera(@PathVariable Long id,
-                                                                      @RequestBody long tempoEspera){
+            @RequestBody long tempoEspera) {
         Pedido pedido = service.retornaPedido(id);
         return ResponseEntity.ok(service.defineTempoEspera(pedido, tempoEspera));
     }

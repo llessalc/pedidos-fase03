@@ -6,7 +6,6 @@ import com.fiap58.pedidos.presenters.dto.saida.DadosCategoriaDto;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +13,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/categoria")
 public class CategoriaController {
 
-    @Autowired
     private ICategoriaService service;  
+
+    public CategoriaController(ICategoriaService _service) {
+        this.service = _service;
+    }
 
     @Operation(description = "Busca categoria por Id")
     @GetMapping("/{id}")
