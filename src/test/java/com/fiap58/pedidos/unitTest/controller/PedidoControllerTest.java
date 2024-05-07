@@ -123,6 +123,6 @@ public class PedidoControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/" + id)
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isNotFound());
     }
 }

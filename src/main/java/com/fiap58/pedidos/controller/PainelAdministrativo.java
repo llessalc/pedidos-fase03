@@ -2,11 +2,11 @@ package com.fiap58.pedidos.controller;
 
 import com.fiap58.pedidos.core.domain.entity.Pedido;
 import com.fiap58.pedidos.core.usecase.IPedidoService;
-import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosDto;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosPainelDto;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +23,12 @@ public class PainelAdministrativo {
     @Operation(description = "Atualiza o status do pedido")
     @PatchMapping("/atualizar/{id}")
     @Transactional
-    public ResponseEntity<DadosPedidosDto> atualizarStatus(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(service.atualizarPedido(id, false));
+    public ResponseEntity<?> atualizarStatus(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(service.atualizarPedido(id, false));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @Operation(description = "Define tempo de espera pedido")
@@ -32,8 +36,14 @@ public class PainelAdministrativo {
     @Transactional
     public ResponseEntity<DadosPedidosPainelDto> atualizarTempoEspera(@PathVariable Long id,
             @RequestBody long tempoEspera) {
+
+        if (tempoEspera < 0L) {
+            throw new IllegalArgumentException("Tempo de espera não pode ser zerado e nem negativo");
+        }
+
         Pedido pedido = service.retornaPedido(id);
         return ResponseEntity.ok(service.defineTempoEspera(pedido, tempoEspera));
+
     }
 
 }
