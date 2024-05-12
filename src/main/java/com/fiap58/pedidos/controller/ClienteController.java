@@ -37,7 +37,11 @@ public class ClienteController {
     @GetMapping("/list")
     public ResponseEntity<List<DadosClienteDto>> listarClientes() {
         List<DadosClienteDto> clientes = service.listarClientes();
-        return ResponseEntity.ok(clientes);
+        if (clientes.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.ok(clientes);
+        }
     }
 
     @Operation(description = "Busca um cliente por Id")

@@ -13,12 +13,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap58.pedidos.controller.CategoriaController;
-import com.fiap58.pedidos.controller.PedidoController;
-import com.fiap58.pedidos.core.domain.entity.Categoria;
 import com.fiap58.pedidos.core.services.CategoriaService;
-import com.fiap58.pedidos.core.services.PedidoService;
 import com.fiap58.pedidos.core.usecase.ICategoriaService;
-import com.fiap58.pedidos.core.usecase.IPedidoService;
 import com.fiap58.pedidos.presenters.dto.entrada.CategoriaDtoEntrada;
 import com.fiap58.pedidos.presenters.dto.saida.DadosCategoriaDto;
 

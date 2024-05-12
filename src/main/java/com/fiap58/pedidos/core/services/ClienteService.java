@@ -10,7 +10,6 @@ import com.fiap58.pedidos.core.usecase.IClienteService;
 import com.fiap58.pedidos.core.usecase.IEnderecoService;
 import com.fiap58.pedidos.core.usecase.ITelefoneService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;

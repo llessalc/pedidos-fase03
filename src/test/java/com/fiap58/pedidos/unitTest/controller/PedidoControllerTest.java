@@ -1,6 +1,5 @@
 package com.fiap58.pedidos.unitTest.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fiap58.pedidos.controller.PedidoController;
 import com.fiap58.pedidos.core.services.PedidoService;
 import com.fiap58.pedidos.core.usecase.IPedidoService;
@@ -25,11 +24,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import static org.mockito.Mockito.when; // Import the necessary class from Mockito library
 import static org.mockito.BDDMockito.given; // Import the necessary class from Mockito library
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath; // Import the necessary class
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -40,9 +36,6 @@ public class PedidoControllerTest {
 
     @Mock
     private IPedidoService pedidoService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @BeforeEach
     public void setup() {
