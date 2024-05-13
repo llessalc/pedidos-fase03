@@ -29,7 +29,7 @@ public class PainelAdministrativoTest {
     private IPedidoService service;
 
     @Test
-    public void testAtualizarStatus() throws Exception {
+    public void testAtualizarStatusSucess() throws Exception {
         // Arrange
         Long id = 1L;
 
@@ -41,6 +41,15 @@ public class PainelAdministrativoTest {
         mockMvc.perform(patch("/adm/atualizar/" + id)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    public void testAtualizarStatusFailed() throws Exception {
+        Long id = 1L;
+
+        when(service.atualizarPedido(any(Long.class), any(Boolean.class))).thenThrow(new RuntimeException());
+        mockMvc.perform(patch("/adm/atualizar/" + id)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -60,5 +69,18 @@ public class PainelAdministrativoTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(String.valueOf(tempoEspera)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testAtualizarTempoEsperaFailed() throws Exception {
+        // Arrange
+        Long id = 1L;
+        long tempoEspera = -9L;
+
+        // Act & Assert
+        mockMvc.perform(post("/adm/define-tempo-espera/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(String.valueOf(tempoEspera)))
+                .andExpect(status().isBadRequest());
     }
 }

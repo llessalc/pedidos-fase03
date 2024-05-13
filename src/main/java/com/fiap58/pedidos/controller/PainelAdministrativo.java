@@ -36,15 +36,19 @@ public class PainelAdministrativo {
     @Operation(description = "Define tempo de espera pedido")
     @PostMapping("/define-tempo-espera/{id}")
     @Transactional
-    public ResponseEntity<DadosPedidosPainelDto> atualizarTempoEspera(@PathVariable Long id,
+    public ResponseEntity<?> atualizarTempoEspera(@PathVariable Long id,
             @RequestBody long tempoEspera) {
 
-        if (tempoEspera < 0L) {
-            throw new IllegalArgumentException("Tempo de espera não pode ser zerado e nem negativo");
-        }
+        try {
+            if (tempoEspera < 0L) {
+                throw new IllegalArgumentException("Tempo de espera não pode ser zerado e nem negativo");
+            }
 
-        Pedido pedido = service.retornaPedido(id);
-        return ResponseEntity.ok(service.defineTempoEspera(pedido, tempoEspera));
+            Pedido pedido = service.retornaPedido(id);
+            return ResponseEntity.ok(service.defineTempoEspera(pedido, tempoEspera));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
 
     }
 
