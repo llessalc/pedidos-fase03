@@ -42,10 +42,10 @@ public class CategoriaController {
             if (categoria != null) {
                 return ResponseEntity.ok(categoria);
             } else {
-                throw new Exception("Categoria nao cadastrada");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
         } catch (Exception e) {
-             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

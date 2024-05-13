@@ -1,10 +1,14 @@
 package com.fiap58.pedidos.unitTest.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -25,96 +29,121 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import org.springframework.http.MediaType;
 
-@ExtendWith(MockitoExtension.class)
-
+@SpringBootTest
+@AutoConfigureMockMvc
 public class CategoriaControllerTest {
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @MockBean
-    private ICategoriaService service;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @Test
-    public void getCategoriaSuccessTest() throws Exception {
+        @MockBean
+        private ICategoriaService service;
 
-        ICategoriaService service = Mockito.mock(CategoriaService.class);
-        mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
-        DadosCategoriaDto categoria = new DadosCategoriaDto(1L, "Categoria Teste");
-        given(service.retornarCategoria(1L)).willReturn(categoria);
+        @BeforeEach
+        public void setup() {
+                MockitoAnnotations.openMocks(this);
+        }
 
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/categoria/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk());
-    }
+        @Test
+        public void getCategoriaSuccessTest() throws Exception {
 
-    @Test
-    public void getCategoriaFailureTest() throws Exception {
-        ICategoriaService service = Mockito.mock(CategoriaService.class);
-        mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
-        given(service.retornarCategoria(1L)).willThrow(new RuntimeException());
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/categoria/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
-    }
+                ICategoriaService service = Mockito.mock(CategoriaService.class);
+                mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
+                DadosCategoriaDto categoria = new DadosCategoriaDto(1L, "Categoria Teste");
+                given(service.retornarCategoria(1L)).willReturn(categoria);
 
-    @Test
-    void testDeletarCategoria() throws Exception {
-        ICategoriaService service = Mockito.mock(CategoriaService.class);
-        mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
-        doNothing().when(service).deletarCategoria(1L);
-        mockMvc.perform(
-                MockMvcRequestBuilders.delete("/categoria/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
-    }
+                mockMvc.perform(
+                                MockMvcRequestBuilders.get("/categoria/1")
+                                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isOk());
+        }
 
-    @Test
-    void testDeletarCategoriaFailureTest() throws Exception {
-        ICategoriaService service = Mockito.mock(CategoriaService.class);
-        mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
-        doThrow(new RuntimeException()).when(service).deletarCategoria(anyLong());
-        mockMvc.perform(
-                MockMvcRequestBuilders.delete("/categoria/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
-    }
+        @Test
+        public void getCategoriaFailureTest() throws Exception {
+                ICategoriaService service = Mockito.mock(CategoriaService.class);
+                mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
+                given(service.retornarCategoria(1L)).willThrow(new RuntimeException());
+                mockMvc.perform(
+                                MockMvcRequestBuilders.get("/categoria/1")
+                                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isNotFound());
+        }
 
-    @Test
-    void testCadastraCategoria() throws Exception {
-        ICategoriaService service = Mockito.mock(CategoriaService.class);
-        mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
-        DadosCategoriaDto dadosCategoriaDto = new DadosCategoriaDto(1L, "Categoria Teste");
-        // preencha o objeto dadosCate
-        given(service.cadastrarCategoria(any(CategoriaDtoEntrada.class))).willReturn(dadosCategoriaDto);
+        @Test
+        void testDeletarCategoria() throws Exception {
+                ICategoriaService service = Mockito.mock(CategoriaService.class);
+                mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
+                doNothing().when(service).deletarCategoria(1L);
+                mockMvc.perform(
+                                MockMvcRequestBuilders.delete("/categoria/1")
+                                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        }
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(dadosCategoriaDto);
+        @Test
+        void testDeletarCategoriaFailureTest() throws Exception {
+                ICategoriaService service = Mockito.mock(CategoriaService.class);
+                mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
+                doThrow(new RuntimeException()).when(service).deletarCategoria(anyLong());
+                mockMvc.perform(
+                                MockMvcRequestBuilders.delete("/categoria/1")
+                                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+        }
 
-        mockMvc.perform(
-                MockMvcRequestBuilders.post("/categoria")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        @Test
+        void testCadastraCategoria() throws Exception {
+                ICategoriaService service = Mockito.mock(CategoriaService.class);
+                mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
 
-    }
+                CategoriaDtoEntrada categoriaDto = new CategoriaDtoEntrada("Categoria Teste");
+                DadosCategoriaDto savedCategoriaDto = new DadosCategoriaDto(1L, "Categoria Teste");
+                // preencha o objeto dadosCate
+                Mockito.when(service.cadastrarCategoria(categoriaDto)).thenReturn(savedCategoriaDto);
 
-    @Test
-    void testCadastraCategoriaFailureTest() throws Exception {
-        ICategoriaService service = Mockito.mock(CategoriaService.class);
-        mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
-        DadosCategoriaDto dadosCategoriaDto = new DadosCategoriaDto(1L, "Categoria Teste");
-        // preencha o objeto dadosCate
-        given(service.cadastrarCategoria(any(CategoriaDtoEntrada.class))).willThrow(new RuntimeException());
+                mockMvc.perform(
+                                MockMvcRequestBuilders.post("/categoria")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(new ObjectMapper().writeValueAsString(categoriaDto)))
+                                .andExpect(MockMvcResultMatchers.status().isOk());
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(dadosCategoriaDto);
+        }
 
-        mockMvc.perform(
-                MockMvcRequestBuilders.post("/categoria")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
-    }
+        @Test
+        void testCadastraCategoriaComRetornoNull() throws Exception {
+                ICategoriaService service = Mockito.mock(CategoriaService.class);
+                mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
+
+                CategoriaDtoEntrada categoriaDto = new CategoriaDtoEntrada("Categoria Teste");
+                // preencha o objeto dadosCate
+                Mockito.when(service.cadastrarCategoria(categoriaDto)).thenReturn(null);
+
+                mockMvc.perform(
+                                MockMvcRequestBuilders.post("/categoria")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(new ObjectMapper().writeValueAsString(categoriaDto)))
+                                .andExpect(MockMvcResultMatchers.status().isNotFound());
+
+        }
+
+        @Test
+        void testCadastraCategoriaFailureTest() throws Exception {
+                ICategoriaService service = Mockito.mock(CategoriaService.class);
+                mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
+
+                CategoriaDtoEntrada categoriaDto = new CategoriaDtoEntrada("Categoria Teste");
+                // preencha o objeto dadosCate
+                given(service.cadastrarCategoria(categoriaDto)).willThrow(new RuntimeException());
+
+                String json = objectMapper.writeValueAsString(categoriaDto);
+
+                mockMvc.perform(MockMvcRequestBuilders.post("/categoria")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(json))
+                                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+        }
+
 }

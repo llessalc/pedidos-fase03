@@ -2,6 +2,7 @@ package com.fiap58.pedidos.controller;
 
 import com.fiap58.pedidos.core.domain.entity.Pedido;
 import com.fiap58.pedidos.core.usecase.IPedidoService;
+import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosDto;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosPainelDto;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.transaction.Transactional;
@@ -25,7 +26,8 @@ public class PainelAdministrativo {
     @Transactional
     public ResponseEntity<?> atualizarStatus(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(service.atualizarPedido(id, false));
+            DadosPedidosDto data = service.atualizarPedido(id, false);
+            return ResponseEntity.ok(data);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }

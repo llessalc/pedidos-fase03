@@ -23,10 +23,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
 import com.fiap58.pedidos.controller.ClienteController;
-import com.fiap58.pedidos.core.domain.entity.Cliente;
 import com.fiap58.pedidos.core.services.ClienteService;
 import com.fiap58.pedidos.core.usecase.IClienteService;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosClienteCadastro;
