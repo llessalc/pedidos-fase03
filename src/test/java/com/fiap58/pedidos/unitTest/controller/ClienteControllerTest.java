@@ -36,179 +36,178 @@ import com.fiap58.pedidos.presenters.dto.saida.DadosClienteDto;
 @AutoConfigureMockMvc
 public class ClienteControllerTest {
 
-        @Autowired
-        private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-        @Autowired
-        private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-        @MockBean
-        private IClienteService service;
+    @MockBean
+    private IClienteService service;
 
-        @BeforeEach
-        public void setup() {
-                // Mock the service
+    @BeforeEach
+    public void setup() {
+        // Mock the service
 
-                MockitoAnnotations.openMocks(this);
-        }
+        MockitoAnnotations.openMocks(this);
+    }
 
-        @Test
-        void testCadastrarClienteSuccessTest() throws Exception {
-                // Mock the service
-                IClienteService service = Mockito.mock(ClienteService.class);
-                mockMvc = MockMvcBuilders.standaloneSetup(new ClienteController(service)).build();
+    @Test
+    void testCadastrarClienteSuccessTest() throws Exception {
+        // Mock the service
+        IClienteService service = Mockito.mock(ClienteService.class);
+        mockMvc = MockMvcBuilders.standaloneSetup(new ClienteController(service)).build();
 
-                // Create the input and output data
-                List<EnderecoCadastro> enderecos = new ArrayList<>();
-                List<TelefoneCadastro> telefones = new ArrayList<>();
-                DadosClienteCadastro dadosClienteCadastro = new DadosClienteCadastro("12345678900", "Nome do Cliente",
-                                enderecos, telefones);
-                DadosClienteDto dadosClienteDto = new DadosClienteDto(1L, "0000", "Nome do Cliente");
+        // Create the input and output data
+        List<EnderecoCadastro> enderecos = new ArrayList<>();
+        List<TelefoneCadastro> telefones = new ArrayList<>();
+        DadosClienteCadastro dadosClienteCadastro = new DadosClienteCadastro("12345678900", "Nome do Cliente",
+                enderecos, telefones);
+        DadosClienteDto dadosClienteDto = new DadosClienteDto(1L, "0000", "Nome do Cliente");
 
-                // Set up the service to return the output data when called with the input data
-                when(service.cadastrarCliente(any(DadosClienteCadastro.class))).thenReturn(dadosClienteDto);
+        // Set up the service to return the output data when called with the input data
+        when(service.cadastrarCliente(any(DadosClienteCadastro.class))).thenReturn(dadosClienteDto);
 
-                // Convert the input data to JSON
-                String json = objectMapper.writeValueAsString(dadosClienteCadastro);
+        // Convert the input data to JSON
+        String json = objectMapper.writeValueAsString(dadosClienteCadastro);
 
-                // Make a POST request to the controller and check the response
-                mockMvc.perform(MockMvcRequestBuilders.post("/cliente/inserir")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .content(json))
-                                .andExpect(
-                                                MockMvcResultMatchers.status().isCreated());
-        }
+        // Make a POST request to the controller and check the response
+        mockMvc.perform(MockMvcRequestBuilders.post("/cliente/inserir")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(
+                        MockMvcResultMatchers.status().isCreated());
+    }
 
-        @Test
-        void testCadastrarClienteFailedTest() throws Exception {
-                // Mock the service
-                IClienteService service = Mockito.mock(ClienteService.class);
-                mockMvc = MockMvcBuilders.standaloneSetup(new ClienteController(service)).build();
+    @Test
+    void testCadastrarClienteFailedTest() throws Exception {
+        // Mock the service
+        IClienteService service = Mockito.mock(ClienteService.class);
+        mockMvc = MockMvcBuilders.standaloneSetup(new ClienteController(service)).build();
 
-                // Create the input and output data
-                List<EnderecoCadastro> enderecos = new ArrayList<>();
-                List<TelefoneCadastro> telefones = new ArrayList<>();
-                DadosClienteCadastro dadosClienteCadastro = new DadosClienteCadastro("12345678900", "Nome do Cliente",
-                                enderecos, telefones);
+        // Create the input and output data
+        List<EnderecoCadastro> enderecos = new ArrayList<>();
+        List<TelefoneCadastro> telefones = new ArrayList<>();
+        DadosClienteCadastro dadosClienteCadastro = new DadosClienteCadastro("12345678900", "Nome do Cliente",
+                enderecos, telefones);
 
-                // Set up the service to return the output data when called with the input data
-                when(service.cadastrarCliente(any(DadosClienteCadastro.class))).thenReturn(null);
+        // Set up the service to return the output data when called with the input data
+        when(service.cadastrarCliente(any(DadosClienteCadastro.class))).thenReturn(null);
 
-                // Convert the input data to JSON
-                String json = objectMapper.writeValueAsString(dadosClienteCadastro);
+        // Convert the input data to JSON
+        String json = objectMapper.writeValueAsString(dadosClienteCadastro);
 
-                // Make a POST request to the controller and check the response
-                mockMvc.perform(MockMvcRequestBuilders.post("/cliente/inserir")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .content(json))
-                                .andExpect(
-                                                MockMvcResultMatchers.status().isFound());
-        }
+        // Make a POST request to the controller and check the response
+        mockMvc.perform(MockMvcRequestBuilders.post("/cliente/inserir")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(
+                        MockMvcResultMatchers.status().isFound());
+    }
 
-        @Test
-        void testListClienteSuccessTest() throws Exception {
-                // Mock the service
-                IClienteService service = Mockito.mock(IClienteService.class);
-                MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ClienteController(service)).build();
-                DadosClienteDto dadosClienteCadastro = new DadosClienteDto(1l, "12345678900", "Nome do Cliente");
-                DadosClienteDto dadosClienteCadastro1 = new DadosClienteDto(2l, "123456789000", "Nome do Cliente 1");
-                // Create the output data
-                List<DadosClienteDto> clientes = Arrays.asList(
-                                dadosClienteCadastro,
-                                dadosClienteCadastro1);
+    @Test
+    void testListClienteSuccessTest() throws Exception {
+        // Mock the service
+        IClienteService service = Mockito.mock(IClienteService.class);
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ClienteController(service)).build();
+        DadosClienteDto dadosClienteCadastro = new DadosClienteDto(1l, "12345678900", "Nome do Cliente");
+        DadosClienteDto dadosClienteCadastro1 = new DadosClienteDto(2l, "123456789000", "Nome do Cliente 1");
+        // Create the output data
+        List<DadosClienteDto> clientes = Arrays.asList(
+                dadosClienteCadastro,
+                dadosClienteCadastro1);
 
-                // Set up the service to return the output data
-                Mockito.when(service.listarClientes()).thenReturn(clientes);
+        // Set up the service to return the output data
+        Mockito.when(service.listarClientes()).thenReturn(clientes);
 
-                // Perform the GET request and check the response
-                mockMvc.perform(MockMvcRequestBuilders.get("/cliente/list")
-                                .accept(MediaType.APPLICATION_JSON))
-                                .andExpect(MockMvcResultMatchers.status().isOk())
-                                .andExpect(MockMvcResultMatchers.content()
-                                                .json(new ObjectMapper().writeValueAsString(clientes)));
-        }
+        // Perform the GET request and check the response
+        mockMvc.perform(MockMvcRequestBuilders.get("/cliente/list")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(new ObjectMapper().writeValueAsString(clientes)));
+    }
 
-        @Test
-        void testListIdClienteFailedTest() throws Exception {
+    @Test
+    void testListIdClienteFailedTest() throws Exception {
 
-                // Mock the service
-                IClienteService service = Mockito.mock(IClienteService.class);
-                MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ClienteController(service)).build();
-                // Create the output data
-                List<DadosClienteDto> clientes = Arrays.asList();
+        // Mock the service
+        IClienteService service = Mockito.mock(IClienteService.class);
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ClienteController(service)).build();
+        // Create the output data
+        List<DadosClienteDto> clientes = Arrays.asList();
 
-                // Set up the service to return the output data
-                Mockito.when(service.listarClientes()).thenReturn(clientes);
+        // Set up the service to return the output data
+        Mockito.when(service.listarClientes()).thenReturn(clientes);
 
-                // Perform the GET request and check the response
-                mockMvc.perform(MockMvcRequestBuilders.get("/cliente/list")
-                                .accept(MediaType.APPLICATION_JSON))
-                                .andExpect(MockMvcResultMatchers.status().isNoContent());
-        }
+        // Perform the GET request and check the response
+        mockMvc.perform(MockMvcRequestBuilders.get("/cliente/list")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
 
-        @Test
-        void testBuscarClientesSuccessTest() throws Exception {
+    @Test
+    void testBuscarClientesSuccessTest() throws Exception {
 
-                IClienteService service = Mockito.mock(IClienteService.class);
-                MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ClienteController(service)).build();
+        IClienteService service = Mockito.mock(IClienteService.class);
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ClienteController(service)).build();
 
-                // Create the output data
-                DadosClienteDto dadosClienteDto = new DadosClienteDto(1l, "0000", "fulano");
+        // Create the output data
+        DadosClienteDto dadosClienteDto = new DadosClienteDto(1l, "0000", "fulano");
 
-                // Set up the service to return the output data
-                Long id = 1L; // Replace with the ID you want to test
-                Mockito.when(service.retornaClienteId(id)).thenReturn(dadosClienteDto);
+        // Set up the service to return the output data
+        Long id = 1L; // Replace with the ID you want to test
+        Mockito.when(service.retornaClienteId(id)).thenReturn(dadosClienteDto);
 
-                // Perform the GET request and check the response
-                mockMvc.perform(MockMvcRequestBuilders.get("/cliente/" + id)
-                                .accept(MediaType.APPLICATION_JSON))
-                                .andExpect(MockMvcResultMatchers.status().isOk());
+        // Perform the GET request and check the response
+        mockMvc.perform(MockMvcRequestBuilders.get("/cliente/" + id)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk());
 
-        }
+    }
 
-        @Test
-        void testBuscarClientesFailedTest() throws Exception {
-                IClienteService service = Mockito.mock(IClienteService.class);
-                MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ClienteController(service)).build();
+    @Test
+    void testBuscarClientesFailedTest() throws Exception {
+        IClienteService service = Mockito.mock(IClienteService.class);
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ClienteController(service)).build();
 
-                // Set up the service to return the output data
-                Long id = 1L; // Replace with the ID you want to test
-                Mockito.when(service.retornaClienteId(id)).thenReturn(null);
+        // Set up the service to return the output data
+        Long id = 1L; // Replace with the ID you want to test
+        Mockito.when(service.retornaClienteId(id)).thenReturn(null);
 
-                // Perform the GET request and check the response
-                mockMvc.perform(MockMvcRequestBuilders.get("/cliente/" + id)
-                                .accept(MediaType.APPLICATION_JSON))
-                                .andExpect(MockMvcResultMatchers.status().isNotFound());
-        }
+        // Perform the GET request and check the response
+        mockMvc.perform(MockMvcRequestBuilders.get("/cliente/" + id)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
 
-        @Test
-        void testbuscarClientePorCpfSucessTest() throws Exception {
-                IClienteService service = Mockito.mock(IClienteService.class);
-                MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ClienteController(service)).build();
+    @Test
+    void testbuscarClientePorCpfSucessTest() throws Exception {
+        IClienteService service = Mockito.mock(IClienteService.class);
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ClienteController(service)).build();
 
-                DadosClienteDto dadosClienteCadastro = new DadosClienteDto(1l, "12345678900", "Nome do Cliente");
-                // Set up the service to return the output data
-                String cpf = "12345678900"; // Replace with the ID you want to test
-                Mockito.when(service.retornaClienteCpf(cpf)).thenReturn(dadosClienteCadastro);
+        DadosClienteDto dadosClienteCadastro = new DadosClienteDto(1l, "12345678900", "Nome do Cliente");
+        // Set up the service to return the output data
+        String cpf = "12345678900"; // Replace with the ID you want to test
+        Mockito.when(service.retornaClienteCpf(cpf)).thenReturn(dadosClienteCadastro);
 
-                // Perform the GET request and check the response
-                mockMvc.perform(MockMvcRequestBuilders.get("/cliente/cpf/" + cpf)
-                                .accept(MediaType.APPLICATION_JSON))
-                                .andExpect(MockMvcResultMatchers.status().isOk());
-        }
+        // Perform the GET request and check the response
+        mockMvc.perform(MockMvcRequestBuilders.get("/cliente/cpf/" + cpf)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
 
-        @Test
-        void testbuscarClientePorCpfFailedTest() throws Exception {
-                IClienteService service = Mockito.mock(IClienteService.class);
-                MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ClienteController(service)).build();
+    @Test
+    void testbuscarClientePorCpfFailedTest() throws Exception {
+        IClienteService service = Mockito.mock(IClienteService.class);
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ClienteController(service)).build();
 
-                String cpf = "12345678900";
-                Mockito.when(service.retornaClienteCpf(cpf)).thenReturn(null);
+        String cpf = "12345678900"; 
+        Mockito.when(service.retornaClienteCpf(cpf)).thenReturn(null);
 
-                mockMvc.perform(MockMvcRequestBuilders.get("/cliente/cpf/" + cpf)
-                                .accept(MediaType.APPLICATION_JSON))
-                                .andExpect(MockMvcResultMatchers.status().isNotFound());
-        }
+        mockMvc.perform(MockMvcRequestBuilders.get("/cliente/cpf/" + cpf)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
 }

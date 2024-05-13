@@ -47,25 +47,36 @@ public class PedidoController {
     @Operation(description = "Inicia Checkout")
     @PostMapping("/checkout")
     public ResponseEntity<Long> incluirPedido(@RequestBody @Valid DadosPedidosEntrada dto) {
-        DadosPedidosDto dadosPedidosDto = service.inserirPedidoFila(dto);
+        try {
+            DadosPedidosDto dadosPedidosDto = service.inserirPedidoFila(dto);
 
-        return ResponseEntity.ok(dadosPedidosDto.getId());
+            return ResponseEntity.ok(dadosPedidosDto.getId());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @Operation(description = "Recebe aprovação de pagamento e pedido é transferido para cozinha")
     @PostMapping("/confirmacao-pagamento/{id}")
     @Transactional
     public ResponseEntity<DadosPedidosDto> recebePagamento(@PathVariable Long id) throws Exception {
-        return ResponseEntity.ok(processaPagamento(id));
-    }
-
-    private DadosPedidosDto processaPagamento(Long id) throws Exception {
-        return service.recebePagamento(id);
+        try {
+            DadosPedidosDto objTarget = service.recebePagamento(id);
+            return ResponseEntity.ok(objTarget);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @Operation(description = "Lista pedido")
     @GetMapping("/{id}")
-    public ResponseEntity<DadosPedidosValorDto> listarPedido(@PathVariable Long id) {
-        return ResponseEntity.ok(service.buscaPedido(id));
+    public ResponseEntity<?> listarPedido(@PathVariable Long id) {
+        try {
+            DadosPedidosValorDto objTarget = service.buscaPedido(id);
+            return ResponseEntity.ok(objTarget);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 }
