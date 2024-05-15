@@ -16,8 +16,6 @@ import java.time.Instant;
 @Setter
 public class Produto {
 
-    public Produto() {
-    };
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

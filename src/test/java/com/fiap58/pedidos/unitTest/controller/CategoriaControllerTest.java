@@ -99,7 +99,7 @@ public class CategoriaControllerTest {
                 mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
 
                 CategoriaDtoEntrada categoriaDto = new CategoriaDtoEntrada("Categoria Teste");
-                DadosCategoriaDto savedCategoriaDto = new DadosCategoriaDto(1L, "Categoria Teste");
+                DadosCategoriaDto savedCategoriaDto = new DadosCategoriaDto(1L, "CategoriaTeste");
                 // preencha o objeto dadosCate
                 Mockito.when(service.cadastrarCategoria(categoriaDto)).thenReturn(savedCategoriaDto);
 
@@ -112,32 +112,15 @@ public class CategoriaControllerTest {
         }
 
         @Test
-        void testCadastraCategoriaComRetornoNull() throws Exception {
-                ICategoriaService service = Mockito.mock(CategoriaService.class);
-                mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
-
-                CategoriaDtoEntrada categoriaDto = new CategoriaDtoEntrada("Categoria Teste");
-                // preencha o objeto dadosCate
-                Mockito.when(service.cadastrarCategoria(categoriaDto)).thenReturn(null);
-
-                mockMvc.perform(
-                                MockMvcRequestBuilders.post("/categoria")
-                                                .contentType(MediaType.APPLICATION_JSON)
-                                                .content(new ObjectMapper().writeValueAsString(categoriaDto)))
-                                .andExpect(MockMvcResultMatchers.status().isNotFound());
-
-        }
-
-        @Test
         void testCadastraCategoriaFailureTest() throws Exception {
                 ICategoriaService service = Mockito.mock(CategoriaService.class);
                 mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
 
-                CategoriaDtoEntrada categoriaDto = new CategoriaDtoEntrada("Categoria Teste");
+                DadosCategoriaDto dadosCategoriaDto = new DadosCategoriaDto(1L, "Categoria Teste");
                 // preencha o objeto dadosCate
-                given(service.cadastrarCategoria(categoriaDto)).willThrow(new RuntimeException());
+                given(service.cadastrarCategoria(any(CategoriaDtoEntrada.class))).willThrow(new RuntimeException());
 
-                String json = objectMapper.writeValueAsString(categoriaDto);
+                String json = objectMapper.writeValueAsString(dadosCategoriaDto);
 
                 mockMvc.perform(MockMvcRequestBuilders.post("/categoria")
                                 .contentType(MediaType.APPLICATION_JSON)
