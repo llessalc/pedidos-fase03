@@ -12,8 +12,11 @@ import java.util.List;
 @Service
 public class PedidoProdutoService implements IPedidoProdutoService {
 
-    @Autowired
-    private PedidoProdutoRepository repository;
+    private final PedidoProdutoRepository repository;
+
+    public PedidoProdutoService(PedidoProdutoRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public void inserirPedidoProduto(PedidoProduto pedidoProduto) {

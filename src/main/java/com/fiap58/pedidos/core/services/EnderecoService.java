@@ -12,18 +12,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class EnderecoService implements IEnderecoService {
 
-    @Autowired
-    private EnderecoRepository repository;
+    private final EnderecoRepository repository;
+
+    public EnderecoService(EnderecoRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
-    public DadosEnderecoDto cadstrarEndereco(EnderecoCadastro enderecoCadastro, Cliente cliente){
+    public DadosEnderecoDto cadstrarEndereco(EnderecoCadastro enderecoCadastro, Cliente cliente) {
         Endereco endereco = new Endereco(enderecoCadastro);
         endereco.setCliente(cliente);
         Endereco enderecoSalvo = repository.save(endereco);
-        return mapperEnderecoDto(enderecoSalvo);
+        return new DadosEnderecoDto(enderecoSalvo);
     }
 
-    private DadosEnderecoDto mapperEnderecoDto(Endereco endereco){
-        return new DadosEnderecoDto(endereco);
-    }
 }

@@ -24,13 +24,11 @@ public record DadosProdutoDtoEntrada(
         }
 
         public String descricao() {
-                return nome;
+                return descricao;
         }
 
         public BigDecimal precoAtual() {
                 return precoAtual;
         }
 
-        // public DadosProdutoDtoEntrada {
-        // }
 }

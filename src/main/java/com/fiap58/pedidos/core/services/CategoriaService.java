@@ -15,20 +15,23 @@ import java.util.stream.Collectors;
 @Service
 public class CategoriaService implements ICategoriaService {
 
-    @Autowired
-    private CategoriaRepository repository;
+    private final CategoriaRepository repository;
+
+    public CategoriaService(CategoriaRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
-    public Categoria buscarCategoria(Long id){
+    public Categoria buscarCategoria(Long id) {
         return repository.getReferenceById(id);
     }
 
     @Override
-    public DadosCategoriaDto retornarCategoria(Long id){
+    public DadosCategoriaDto retornarCategoria(Long id) {
         return mapperCategoria(buscarCategoria(id));
     }
 
-    private DadosCategoriaDto mapperCategoria(Categoria categoria){
+    private DadosCategoriaDto mapperCategoria(Categoria categoria) {
         return new DadosCategoriaDto(categoria);
     }
 
@@ -36,18 +39,18 @@ public class CategoriaService implements ICategoriaService {
     public DadosCategoriaDto cadastrarCategoria(CategoriaDtoEntrada dto) {
         for (Categoria categoria : recuperaCategoriasVigentes(recuperaCategorias())) {
             if (categoria.getNomeCategoria().equals(dto.nomeCategoria()) &&
-            categoria.getDeletadoEm() == null)
+                    categoria.getDeletadoEm() == null)
                 return null;
         }
         Categoria categoriaSalva = repository.save(new Categoria(dto.nomeCategoria()));
         return mapperCategoria(categoriaSalva);
     }
 
-    private List<Categoria> recuperaCategorias(){
+    private List<Categoria> recuperaCategorias() {
         return repository.findAll();
     }
 
-    private List<Categoria> recuperaCategoriasVigentes(List<Categoria> categorias){
+    private List<Categoria> recuperaCategoriasVigentes(List<Categoria> categorias) {
         return categorias.stream()
                 .filter(categoria -> categoria.getDeletadoEm() != null)
                 .collect(Collectors.toList());

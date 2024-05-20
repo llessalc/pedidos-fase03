@@ -15,4 +15,12 @@ public record DadosClienteCadastro(
         // O corpo do construtor é vazio porque os campos são final e inicializados
         // diretamente
     }
+
+    public String getCpf() {
+        return this.cpf;
+    }
+
+    public String getNome() {
+        return this.nome;
+    }
 }
