@@ -35,7 +35,6 @@ import com.fiap58.pedidos.presenters.dto.saida.DadosClienteDto;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 public class ClienteControllerTest {
 
     @Autowired

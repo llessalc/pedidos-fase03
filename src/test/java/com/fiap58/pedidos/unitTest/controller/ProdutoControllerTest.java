@@ -38,7 +38,6 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 public class ProdutoControllerTest {
     @Autowired
     private MockMvc mockMvc;
