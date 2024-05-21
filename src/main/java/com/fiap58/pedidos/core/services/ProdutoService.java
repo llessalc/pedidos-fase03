@@ -20,11 +20,14 @@ import static com.fiap58.pedidos.core.specifications.ProdutoSpecification.temCat
 @Service
 public class ProdutoService implements IProdutoService {
 
-    @Autowired
-    private ProdutoRepository repository;
+    private final ProdutoRepository repository;
 
-    @Autowired
-    private ICategoriaService categoriaService;
+    private final ICategoriaService categoriaService;
+
+    public ProdutoService(ProdutoRepository repository, ICategoriaService categoriaService) {
+        this.repository = repository;
+        this.categoriaService = categoriaService;
+    }
 
     @Override
     public Produto buscarProduto(long id) {
