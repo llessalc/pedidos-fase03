@@ -46,7 +46,7 @@ spec:
                 secretKeyRef:
                   name: mysql-pass
                   key: password
-            - name: PAGAMENTOS_SERVICE
+            - name: pagamento_service
               value: app-pagamentos
 
           ports:
