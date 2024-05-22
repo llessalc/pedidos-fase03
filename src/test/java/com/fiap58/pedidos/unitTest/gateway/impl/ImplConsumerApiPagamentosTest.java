@@ -2,8 +2,10 @@ package com.fiap58.pedidos.unitTest.gateway.impl;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -16,16 +18,19 @@ import static org.mockito.Mockito.when;
 
 public class ImplConsumerApiPagamentosTest {
 
-    private ImplConsumerApiPagamentos consumerApiPagamentos;
-
     @Mock
     private RestTemplate restTemplate;
+
+    @Mock
+    private Environment environment;
+
+    @InjectMocks
+    ImplConsumerApiPagamentos consumerApiPagamentos;
 
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        consumerApiPagamentos = new ImplConsumerApiPagamentos();
-        consumerApiPagamentos.setRestTemplate(restTemplate);
+        this.consumerApiPagamentos.setRestTemplate(restTemplate);
     }
 
     @Test

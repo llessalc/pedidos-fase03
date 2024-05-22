@@ -35,24 +35,19 @@ import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosValorDto;
 @AllArgsConstructor
 public class PedidoService implements IPedidoService {
 
-    private final PedidoRepository repository;
 
-    private final IClienteService clienteService;
+    @Autowired
+    private PedidoRepository repository;
 
-    private final IProdutoService produtoService;
+    private IClienteService clienteService;
 
-    private final IPedidoProdutoService pedidoProdutoService;
+    private IProdutoService produtoService;
 
-    private final ImplConsumerApiPagamentos consumerApiPagamentos;
+    private IPedidoProdutoService pedidoProdutoService;
 
-    public PedidoService(PedidoRepository repository, IClienteService clienteService, IProdutoService produtoService,
-            IPedidoProdutoService pedidoProdutoService, ImplConsumerApiPagamentos consumerApiPagamentos) {
-        this.repository = repository;
-        this.clienteService = clienteService;
-        this.produtoService = produtoService;
-        this.pedidoProdutoService = pedidoProdutoService;
-        this.consumerApiPagamentos = consumerApiPagamentos;
-    }
+    private ImplConsumerApiPagamentos consumerApiPagamentos;
+
+
 
     @Override
     public DadosPedidosDto inserirPedidoFila(DadosPedidosEntrada dto) {
