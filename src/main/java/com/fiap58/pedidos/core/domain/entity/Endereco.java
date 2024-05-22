@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fiap58.pedidos.presenters.dto.entrada.EnderecoCadastro;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
@@ -13,6 +14,7 @@ import java.time.Instant;
 @Table(name = "Enderecos")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Endereco {
 
     @Id

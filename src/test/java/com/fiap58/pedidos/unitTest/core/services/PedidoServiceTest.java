@@ -7,6 +7,7 @@ import com.fiap58.pedidos.core.usecase.IPedidoProdutoService;
 import com.fiap58.pedidos.core.usecase.IProdutoService;
 import com.fiap58.pedidos.gateway.PedidoRepository;
 import com.fiap58.pedidos.gateway.impl.ImplConsumerApiPagamentos;
+import com.fiap58.pedidos.gateway.impl.ImplConsumerApiProducao;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosClienteCadastro;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosPedidosEntrada;
 import com.fiap58.pedidos.presenters.dto.entrada.ProdutoCarrinho;
@@ -43,6 +44,8 @@ public class PedidoServiceTest {
     private IPedidoProdutoService pedidoProdutoService;
     @Mock
     private ImplConsumerApiPagamentos consumerApiPagamentos;
+    @Mock
+    private ImplConsumerApiProducao consumerApiProducao;
 
     AutoCloseable openMocks;
     private PedidoService service;
@@ -62,7 +65,7 @@ public class PedidoServiceTest {
     @BeforeEach
     void setup(){
         openMocks = MockitoAnnotations.openMocks(this);
-        service = new PedidoService(repository, clienteService, produtoService, pedidoProdutoService, consumerApiPagamentos);
+        service = new PedidoService(repository, clienteService, produtoService, pedidoProdutoService, consumerApiPagamentos, consumerApiProducao);
 
         categoria = new Categoria("lanche");
         produto = new Produto("Produto1", "Descricao 1", new BigDecimal("10.00"));

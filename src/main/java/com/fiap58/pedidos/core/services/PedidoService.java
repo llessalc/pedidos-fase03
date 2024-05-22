@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+import com.fiap58.pedidos.gateway.impl.ImplConsumerApiProducao;
+import com.fiap58.pedidos.presenters.dto.saida.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +28,6 @@ import com.fiap58.pedidos.gateway.PedidoRepository;
 import com.fiap58.pedidos.gateway.impl.ImplConsumerApiPagamentos;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosPedidosEntrada;
 import com.fiap58.pedidos.presenters.dto.entrada.ProdutoCarrinho;
-import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosDto;
-import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosPainelDto;
-import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosValorDto;
 
 @Service
 @NoArgsConstructor
@@ -50,6 +49,9 @@ public class PedidoService implements IPedidoService {
     @Autowired
     private ImplConsumerApiPagamentos consumerApiPagamentos;
 
+    @Autowired
+    private ImplConsumerApiProducao consumerApiProducao;
+
     @Override
     public DadosPedidosDto inserirPedidoFila(DadosPedidosEntrada dto) {
         Cliente cliente;
@@ -62,6 +64,14 @@ public class PedidoService implements IPedidoService {
         Pedido pedidoCriado = repository.save(pedido);
         List<PedidoProduto> pedidosProdutos = processaCarrinhoPedido(dto.carrinho(), pedidoCriado);
         consumerApiPagamentos.acionaCriarPagamento(pedido.getIdPedido());
+        List<DadosProdutoProducao> produtos = new ArrayList<>();
+        for (PedidoProduto pedidoProduto : pedidosProdutos){
+            produtos.add(new DadosProdutoProducao(pedidoProduto));
+        }
+
+        DadosPedidoSaida dadosPedidoSaida = new DadosPedidoSaida(pedidoCriado.getIdPedido(), produtos);
+
+        consumerApiProducao.acionaCriarPedidoProducao(dadosPedidoSaida);
         return new DadosPedidosDto(pedido, pedidosProdutos);
     }
 
