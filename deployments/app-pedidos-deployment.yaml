@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-pedidos
+  labels:
+    app: app-pedidos
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: port-default
+  selector:
+    app: app-pedidos
+    tier: frontend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-pedidos
+  labels:
+    app: app-pedidos
+spec:
+  selector:
+    matchLabels:
+      app: app-pedidos
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: app-pedidos
+        tier: frontend
+    spec:
+      containers:
+        - name: app-pedidos
+          image: DOCKER_IMAGE
+          imagePullPolicy: Always
+          env:
+            - name: MYSQL_DATABASE
+              value: food_58
+            - name: MYSQL_HOST
+              value: DB_HOST
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key: password
+            - name: PAGAMENTOS_SERVICE
+              value: app-pagamentos
+
+          ports:
+            - containerPort: 8080
+              name: app-pedidos
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              mvn clean package
+              mvn spring-boot:run
+          resources:
+            requests:
+              cpu: 700m
