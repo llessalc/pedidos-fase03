@@ -1,184 +1,235 @@
 package com.fiap58.pedidos.unitTest.core.services;
 
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.when;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import com.fiap58.pedidos.core.domain.entity.Cliente;
-import com.fiap58.pedidos.core.domain.entity.Pedido;
-import com.fiap58.pedidos.core.domain.entity.PedidoProduto;
-import com.fiap58.pedidos.core.domain.entity.Produto;
+import com.fiap58.pedidos.core.domain.entity.*;
 import com.fiap58.pedidos.core.services.PedidoService;
-import com.fiap58.pedidos.core.services.ProdutoService;
-import com.fiap58.pedidos.core.usecase.ICategoriaService;
 import com.fiap58.pedidos.core.usecase.IClienteService;
 import com.fiap58.pedidos.core.usecase.IPedidoProdutoService;
 import com.fiap58.pedidos.core.usecase.IProdutoService;
 import com.fiap58.pedidos.gateway.PedidoRepository;
-import com.fiap58.pedidos.gateway.ProdutoRepository;
 import com.fiap58.pedidos.gateway.impl.ImplConsumerApiPagamentos;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosClienteCadastro;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosPedidosEntrada;
-import com.fiap58.pedidos.presenters.dto.entrada.EnderecoCadastro;
 import com.fiap58.pedidos.presenters.dto.entrada.ProdutoCarrinho;
-import com.fiap58.pedidos.presenters.dto.entrada.TelefoneCadastro;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosDto;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosPainelDto;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosValorDto;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Optional;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PedidoServiceTest {
 
-    @Test
-    void testDefineTempoEspera() {
-        PedidoRepository repository = Mockito.mock(PedidoRepository.class);
-        IClienteService clienteService = Mockito.mock(IClienteService.class);
-        IProdutoService produtoService = Mockito.mock(IProdutoService.class);
-        IPedidoProdutoService pedidoProdutoService = Mockito.mock(IPedidoProdutoService.class);
-        ImplConsumerApiPagamentos implConsumerApiPagamentos = Mockito.mock(ImplConsumerApiPagamentos.class);
+    @Mock
+    private PedidoRepository repository;
+    @Mock
+    private IClienteService clienteService;
+    @Mock
+    private IProdutoService produtoService;
+    @Mock
+    private IPedidoProdutoService pedidoProdutoService;
+    @Mock
+    private ImplConsumerApiPagamentos consumerApiPagamentos;
 
-        PedidoService service = new PedidoService(repository, clienteService, produtoService, pedidoProdutoService,
-                implConsumerApiPagamentos);
+    AutoCloseable openMocks;
+    private PedidoService service;
 
-        DadosClienteCadastro dadoscliente = new DadosClienteCadastro("12345678901", "Teste", null, null);
-        Cliente cliente = new Cliente(dadoscliente);
-        Pedido pedido = new Pedido(1l, cliente);
-        List<PedidoProduto> pedidosProdutos = new ArrayList<>();
+    private Produto produto;
+    private Categoria categoria;
+    private Pedido pedidoMock;
+    private Cliente cliente;
+    private DadosClienteCadastro dadosClienteCadastro;
+    private PedidoProduto pedidoProduto;
+    private ProdutoCarrinho produtoCarrinho;
+    private List<ProdutoCarrinho> produtoCarrinhoList = new ArrayList<>();
+    private List<PedidoProduto> pedidoProdutoList = new ArrayList<>();
+    private DadosPedidosEntrada dadosPedidosEntrada;
+    private List<PedidoProduto> produtos = new ArrayList<>();
 
-        Mockito.when(pedidoProdutoService.retornaPedidoProduto(1l)).thenReturn(pedidosProdutos);
+    @BeforeEach
+    void setup() {
+        openMocks = MockitoAnnotations.openMocks(this);
+        service = new PedidoService(repository, clienteService, produtoService, pedidoProdutoService,
+                consumerApiPagamentos);
 
-        DadosPedidosPainelDto result = service.defineTempoEspera(pedido, 1);
+        categoria = new Categoria("lanche");
+        produto = new Produto("Produto1", "Descricao 1", new BigDecimal("10.00"));
+        produto.setIdProduto(100L);
+        produto.setCategoria(categoria);
+        dadosClienteCadastro = new DadosClienteCadastro("0000", "Cliente 1", null, null);
+        cliente = new Cliente(dadosClienteCadastro);
+        pedidoMock = new Pedido(10L, cliente);
+        pedidoProduto = new PedidoProduto(1L, pedidoMock, produto, 10, new BigDecimal("10.00"), "nenhuma");
+        produtos.add(pedidoProduto);
+        pedidoMock.setProdutos(produtos);
+        produtoCarrinho = new ProdutoCarrinho(pedidoProduto);
+        produtoCarrinhoList.add(produtoCarrinho);
+        dadosPedidosEntrada = new DadosPedidosEntrada(produtoCarrinhoList);
+        pedidoProdutoList.add(pedidoProduto);
+    }
 
-        assertNotNull(result);
+    @AfterEach
+    void tearDown() throws Exception {
+        openMocks.close();
+
     }
 
     @Test
+    @DisplayName("Inserindo pedido na fila sem identificar cliente")
     void testInserirPedidoFila() {
-        PedidoRepository repository = Mockito.mock(PedidoRepository.class);
-        IClienteService clienteService = Mockito.mock(IClienteService.class);
-        IProdutoService produtoService = Mockito.mock(IProdutoService.class);
-        IPedidoProdutoService pedidoProdutoService = Mockito.mock(IPedidoProdutoService.class);
-        ImplConsumerApiPagamentos implConsumerApiPagamentos = Mockito.mock(ImplConsumerApiPagamentos.class);
+        when(repository.save(any(Pedido.class))).thenReturn(pedidoMock);
+        doNothing().when(consumerApiPagamentos).acionaCriarPagamento(anyLong());
+        when(produtoService.buscarProduto(anyLong())).thenReturn(produto);
+        doNothing().when(pedidoProdutoService).inserirPedidoProduto(any(PedidoProduto.class));
+        DadosPedidosDto dadosPedidosDto = service.inserirPedidoFila(dadosPedidosEntrada);
 
-        PedidoService service = new PedidoService(repository, clienteService, produtoService, pedidoProdutoService,
-                implConsumerApiPagamentos);
-        List<EnderecoCadastro> enderecos = new ArrayList<>();
-        List<TelefoneCadastro> telefones = new ArrayList<>();
+        assertThat(dadosPedidosDto.getProdutos().get(0).idProduto()).isEqualTo(100L);
+        verify(pedidoProdutoService, times(1)).inserirPedidoProduto(any(PedidoProduto.class));
+    }
 
-        Pedido pedido = new Pedido(null, null);
-        DadosClienteCadastro dadoscliente = new DadosClienteCadastro("12345678901", "Teste", enderecos, telefones);
-        Cliente cliente = new Cliente(dadoscliente);
+    @Test
+    @DisplayName("Inserindo pedido na fila com identificação do cliente")
+    void testInserirPedidoFilaComIdentificacaoDeCliente() {
+        DadosPedidosEntrada dadosPedidosEntradaCliente = new DadosPedidosEntrada(produtoCarrinhoList, 10L);
+        when(repository.save(any(Pedido.class))).thenReturn(pedidoMock);
+        when(clienteService.buscarClientePorId(anyLong())).thenReturn(cliente);
+        doNothing().when(consumerApiPagamentos).acionaCriarPagamento(anyLong());
+        when(produtoService.buscarProduto(anyLong())).thenReturn(produto);
+        doNothing().when(pedidoProdutoService).inserirPedidoProduto(any(PedidoProduto.class));
+        DadosPedidosDto dadosPedidosDto = service.inserirPedidoFila(dadosPedidosEntradaCliente);
 
-        Produto produto = new Produto("Teste", "Teste descricao", new BigDecimal(10.0));
-        List<ProdutoCarrinho> carrinho = new ArrayList<>();
-        DadosPedidosEntrada dto = new DadosPedidosEntrada(carrinho, 1l);
+        assertThat(dadosPedidosDto.getProdutos().get(0).idProduto()).isEqualTo(100L);
+        verify(pedidoProdutoService, times(1)).inserirPedidoProduto(any(PedidoProduto.class));
+        verify(clienteService, times(1)).buscarClientePorId(anyLong());
+    }
 
-        PedidoProduto pedidoProduto = new PedidoProduto(null, pedido, produto, 1, new BigDecimal(10.0), "Teste");
+    @Test
+    @DisplayName("Atualiza pedido de RECEBIDO para EM_PREPARACAO")
+    void testAtualizarPedido() throws Exception {
+        boolean pagamentoRealizado = true;
+        when(repository.findById(anyLong())).thenReturn(Optional.ofNullable(pedidoMock));
+        DadosPedidosDto dadosPedidosDto = service.atualizarPedido(1L, pagamentoRealizado);
 
-        Mockito.when(clienteService.buscarClientePorId(1l)).thenReturn(cliente);
-        Mockito.when(repository.save(Mockito.any(Pedido.class))).thenReturn(pedido);
-        Mockito.when(produtoService.buscarProduto(1l)).thenReturn(produto);
-        Mockito.doAnswer(invocation -> null).when(pedidoProdutoService).inserirPedidoProduto(pedidoProduto);
-        DadosPedidosDto dadospedido = service.inserirPedidoFila(dto);
+        verify(repository, times(1)).findById(anyLong());
+        assertThat(dadosPedidosDto.getStatus()).isEqualTo(StatusPedido.EM_PREPARACAO);
+    }
 
-        assertNotNull(dadospedido);
+    @Test
+    @DisplayName("Atualiza pedido de EM_PREPARACAO para PRONTO")
+    void testAtualizarPedidoParaPronto() throws Exception {
+        boolean pagamentoRealizado = true;
+        pedidoMock.setStatus(StatusPedido.EM_PREPARACAO);
+        when(repository.findById(anyLong())).thenReturn(Optional.ofNullable(pedidoMock));
+        DadosPedidosDto dadosPedidosDto = service.atualizarPedido(1L, pagamentoRealizado);
+
+        verify(repository, times(1)).findById(anyLong());
+        assertThat(dadosPedidosDto.getStatus()).isEqualTo(StatusPedido.PRONTO);
+    }
+
+    @Test
+    @DisplayName("Finaliza pedido")
+    void testAtualizarPedidoParaFinalizado() throws Exception {
+        boolean pagamentoRealizado = true;
+        pedidoMock.setStatus(StatusPedido.PRONTO);
+        when(repository.findById(anyLong())).thenReturn(Optional.ofNullable(pedidoMock));
+        DadosPedidosDto dadosPedidosDto = service.atualizarPedido(1L, pagamentoRealizado);
+
+        verify(repository, times(1)).findById(anyLong());
+        assertThat(dadosPedidosDto.getStatus()).isEqualTo(StatusPedido.FINALIZADO);
     }
 
     @Test
     void testListarPedidos() {
-        PedidoRepository repository = Mockito.mock(PedidoRepository.class);
-        IClienteService clienteService = Mockito.mock(IClienteService.class);
-        IProdutoService produtoService = Mockito.mock(IProdutoService.class);
-        IPedidoProdutoService pedidoProdutoService = Mockito.mock(IPedidoProdutoService.class);
-        ImplConsumerApiPagamentos implConsumerApiPagamentos = Mockito.mock(ImplConsumerApiPagamentos.class);
+        Instant dataAtual = Instant.now();
+        Duration duracao = Duration.ofMinutes(10L);
 
-        PedidoService service = new PedidoService(repository, clienteService, produtoService, pedidoProdutoService,
-                implConsumerApiPagamentos);
+        // Pedido mais antigo junto com 2
+        Pedido pedidoMock0 = new Pedido(2L, cliente);
+        pedidoMock.setDataPedido(dataAtual);
 
-        DadosClienteCadastro dadoscliente = new DadosClienteCadastro("12345678901", "Teste", null, null);
-        Cliente cliente = new Cliente(dadoscliente);
-        Pedido pedido = new Pedido(1l, cliente);
-        List<Pedido> pedidos = new ArrayList<>();
-        pedidos.add(pedido);
+        // Pedido mais novo
+        Pedido pedidoMock1 = new Pedido(3L, cliente);
+        pedidoMock1.setDataPedido(dataAtual.plus(duracao));
 
-        Mockito.when(repository.findAll()).thenReturn(pedidos);
+        // Status mais alto e data mais antiga - 1 Lugar
+        Pedido pedidoMock2 = new Pedido(1L, cliente);
+        pedidoMock2.setDataPedido(dataAtual);
+        pedidoMock2.setStatus(StatusPedido.EM_PREPARACAO);
+        // FINALIZADO NÃO DEVE APARECER
+        Pedido pedidoMock3 = new Pedido(4L, cliente);
+        pedidoMock3.setStatus(StatusPedido.FINALIZADO);
 
-        List<DadosPedidosPainelDto> lDadosPedidosPainelDtos = service.listarPedidos();
+        List<Pedido> pedidoList = new ArrayList<>();
+        pedidoList.add(pedidoMock0);
+        pedidoList.add(pedidoMock1);
+        pedidoList.add(pedidoMock2);
+        pedidoList.add(pedidoMock3);
+        when(repository.findAll()).thenReturn(pedidoList);
 
-        assertNotNull(lDadosPedidosPainelDtos);
+        List<DadosPedidosPainelDto> dadosPedidosPainelDtos = service.listarPedidos();
+
+        assertThat(dadosPedidosPainelDtos.size()).isEqualTo(3);
+        assertThat(dadosPedidosPainelDtos.get(0).getId()).isEqualTo(1L);
+        assertThat(dadosPedidosPainelDtos.get(1).getId()).isEqualTo(2L);
+        assertThat(dadosPedidosPainelDtos.get(2).getId()).isEqualTo(3L);
+
+    }
+
+    @Test
+    void testBuscaPedido() {
+        when(repository.findById(anyLong())).thenReturn(Optional.ofNullable(pedidoMock));
+
+        DadosPedidosValorDto dadosPedidosValorDto = service.buscaPedido(1L);
+        assertThat(dadosPedidosValorDto.getId()).isEqualTo(10L);
+        verify(repository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    void testDefineTempoEspera() {
+        Instant dataAtual = Instant.now();
+        long tempo = 10L;
+        DadosPedidosPainelDto dadosPedidosPainelDto = service.defineTempoEspera(pedidoMock, tempo);
+
+        assertThat(dadosPedidosPainelDto.getTempoEspera()).isEqualTo(10);
     }
 
     @Test
     void testRecebePagamento() throws Exception {
-        PedidoRepository repository = Mockito.mock(PedidoRepository.class);
-        IClienteService clienteService = Mockito.mock(IClienteService.class);
-        IProdutoService produtoService = Mockito.mock(IProdutoService.class);
-        IPedidoProdutoService pedidoProdutoService = Mockito.mock(IPedidoProdutoService.class);
-        ImplConsumerApiPagamentos implConsumerApiPagamentos = Mockito.mock(ImplConsumerApiPagamentos.class);
+        when(repository.findById(anyLong())).thenReturn(Optional.ofNullable(pedidoMock));
+        pedidoMock.setStatus(StatusPedido.RECEBIDO);
 
-        PedidoService service = new PedidoService(repository, clienteService, produtoService, pedidoProdutoService,
-                implConsumerApiPagamentos);
-
-        DadosClienteCadastro dadoscliente = new DadosClienteCadastro("12345678901", "Teste", null, null);
-        Cliente cliente = new Cliente(dadoscliente);
-        Pedido pedido = new Pedido(1l, cliente);
-        pedido.setProdutos(new ArrayList<>()); // Inicializa a lista de produtos
-
-        Mockito.when(repository.findById(1l)).thenReturn(Optional.of(pedido));
-
-        DadosPedidosDto dadosPedidosDto = service.recebePagamento(1l);
-
-        assertNotNull(dadosPedidosDto);
+        DadosPedidosDto dadosPedidosDto = service.recebePagamento(1L);
+        assertThat(dadosPedidosDto.getStatus()).isEqualTo(StatusPedido.EM_PREPARACAO);
+        verify(repository, times(2)).findById(anyLong());
     }
 
     @Test
     void testRetornaPedido() {
-        PedidoRepository repository = Mockito.mock(PedidoRepository.class);
-        IClienteService clienteService = Mockito.mock(IClienteService.class);
-        IProdutoService produtoService = Mockito.mock(IProdutoService.class);
-        IPedidoProdutoService pedidoProdutoService = Mockito.mock(IPedidoProdutoService.class);
-        ImplConsumerApiPagamentos implConsumerApiPagamentos = Mockito.mock(ImplConsumerApiPagamentos.class);
-
-        PedidoService service = new PedidoService(repository, clienteService, produtoService, pedidoProdutoService,
-                implConsumerApiPagamentos);
-
-        DadosClienteCadastro dadoscliente = new DadosClienteCadastro("12345678901", "Teste", null, null);
-        Cliente cliente = new Cliente(dadoscliente);
-        Pedido pedido = new Pedido(1l, cliente);
-
-        Mockito.when(repository.findById(1l)).thenReturn(Optional.of(pedido));
-
-        Pedido pedidoresult = service.retornaPedido(1l);
-
-        assertNotNull(pedidoresult);
+        when(repository.findById(anyLong())).thenReturn(Optional.ofNullable(pedidoMock));
+        Pedido pedido = service.retornaPedido(1L);
+        assertThat(pedido).isEqualTo(pedidoMock);
+        verify(repository, times(1)).findById(anyLong());
     }
 
     @Test
     void testRetornaTabelaJuncao() {
-        PedidoRepository repository = Mockito.mock(PedidoRepository.class);
-        IClienteService clienteService = Mockito.mock(IClienteService.class);
-        IProdutoService produtoService = Mockito.mock(IProdutoService.class);
-        IPedidoProdutoService pedidoProdutoService = Mockito.mock(IPedidoProdutoService.class);
-        ImplConsumerApiPagamentos implConsumerApiPagamentos = Mockito.mock(ImplConsumerApiPagamentos.class);
-
-        PedidoService service = new PedidoService(repository, clienteService, produtoService, pedidoProdutoService,
-                implConsumerApiPagamentos);
-
-        DadosClienteCadastro dadoscliente = new DadosClienteCadastro("12345678901", "Teste", null, null);
-        Cliente cliente = new Cliente(dadoscliente);
-        Pedido pedido = new Pedido(1l, cliente);
-
-        List<PedidoProduto> pedidosProdutos = new ArrayList<>();
-        Mockito.when(pedidoProdutoService.retornaPedidoProduto(1l)).thenReturn(pedidosProdutos);
-
-        List<PedidoProduto> result = service.retornaTabelaJuncao(pedido);
-
-        assertNotNull(result);
+        when(pedidoProdutoService.retornaPedidoProduto(anyLong())).thenReturn(pedidoProdutoList);
+        List<PedidoProduto> pedidoProdutos = service.retornaTabelaJuncao(pedidoMock);
+        assertThat(pedidoProdutos.size()).isEqualTo(1);
+        assertThat(pedidoProdutos.get(0)).isEqualTo(pedidoProduto);
+        verify(pedidoProdutoService, times(1)).retornaPedidoProduto(anyLong());
     }
 }
