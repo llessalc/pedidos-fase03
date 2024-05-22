@@ -1,12 +1,16 @@
 package com.fiap58.pedidos.gateway.impl;
 
 import com.fiap58.pedidos.gateway.ConsumerApiPagamentos;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@NoArgsConstructor
+@AllArgsConstructor
 public class ImplConsumerApiPagamentos implements ConsumerApiPagamentos {
 
     @Autowired

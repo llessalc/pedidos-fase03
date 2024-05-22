@@ -32,6 +32,7 @@ import org.springframework.http.MediaType;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class CategoriaControllerTest {
         @Autowired
         private MockMvc mockMvc;
