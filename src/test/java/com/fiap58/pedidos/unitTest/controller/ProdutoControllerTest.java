@@ -37,6 +37,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -51,7 +52,9 @@ public class ProdutoControllerTest {
     @MockBean
     private IProdutoService service;
 
+    private final String ENDPOINT_API_PEDIDO_INSERIR = "http://localhost:8080/produto";
     private final String ENDPOINT_API_PEDIDO_ATUALIZAR = "http://localhost:8080/produto/{idProduto}";
+    private final String ENDPOINT_API_PEDIDO_DELETAR = "http://localhost:8080/produto/{idProduto}";
 
     private Produto produto;
     private Categoria categoria;
@@ -65,35 +68,7 @@ public class ProdutoControllerTest {
         produto.setCategoria(categoria);
     }
 
-    @Test
-    void testAtualizarProduto() throws Exception {
-        IProdutoService service = Mockito.mock(ProdutoService.class);
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ProdutoController(service)).build();
-        String idProduto = "1";
-        when(service.updateProduto(anyLong(), any(DadosProdutoDto.class))).thenReturn(produto);
-        DadosProdutoDto dadosProdutoDto = new DadosProdutoDto(produto);
 
-        mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT_API_PEDIDO_ATUALIZAR, idProduto)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(asJsonString(dadosProdutoDto)))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
-        verify(service, times(1)).updateProduto(anyLong(), any(DadosProdutoDto.class));
-    }
-
-    @Test
-    void testAtualizarProdutoComErro() throws Exception {
-        IProdutoService service = Mockito.mock(ProdutoService.class);
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ProdutoController(service)).build();
-        String idProduto = "1";
-        when(service.updateProduto(anyLong(), any(DadosProdutoDto.class))).thenThrow(new RuntimeException());
-        DadosProdutoDto dadosProdutoDto = new DadosProdutoDto(produto);
-
-        mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT_API_PEDIDO_ATUALIZAR, idProduto)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(dadosProdutoDto)))
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
-        verify(service, times(1)).updateProduto(anyLong(), any(DadosProdutoDto.class));
-    }
 
     @Test
     void testBuscarProdutoSucess() throws Exception {
@@ -191,6 +166,98 @@ public class ProdutoControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/produto/buscaPorCat/teste10")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+    }
+
+    @Test
+    void testInlcuirProduto() throws Exception {
+        IProdutoService service = Mockito.mock(ProdutoService.class);
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ProdutoController(service)).build();
+        DadosProdutoDtoEntrada dto = new DadosProdutoDtoEntrada(1L, "Teste", "Teste", new BigDecimal(10));
+        DadosProdutoDto dadosProdutoDto = new DadosProdutoDto(produto);
+
+        when(service.inserirProduto(any(DadosProdutoDtoEntrada.class))).thenReturn(dadosProdutoDto);
+
+        mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT_API_PEDIDO_INSERIR)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(dto)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        verify(service, times(1)).inserirProduto(any(DadosProdutoDtoEntrada.class));
+    }
+
+    @Test
+    void testInlcuirProdutoFalha() throws Exception {
+        IProdutoService service = Mockito.mock(ProdutoService.class);
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ProdutoController(service)).build();
+        DadosProdutoDtoEntrada dto = new DadosProdutoDtoEntrada(1L, "Teste", "Teste", new BigDecimal(10));
+
+        when(service.inserirProduto(any(DadosProdutoDtoEntrada.class))).thenThrow(new RuntimeException());
+
+        mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT_API_PEDIDO_INSERIR)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(dto)))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+
+        verify(service, times(1)).inserirProduto(any(DadosProdutoDtoEntrada.class));
+    }
+
+    @Test
+    void testAtualizarProduto() throws Exception {
+        IProdutoService service = Mockito.mock(ProdutoService.class);
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ProdutoController(service)).build();
+        String idProduto = "1";
+        when(service.updateProduto(anyLong(), any(DadosProdutoDto.class))).thenReturn(produto);
+        DadosProdutoDto dadosProdutoDto = new DadosProdutoDto(produto);
+
+        mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT_API_PEDIDO_ATUALIZAR, idProduto)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(dadosProdutoDto))).andDo(print())
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+        verify(service, times(1)).updateProduto(anyLong(), any(DadosProdutoDto.class));
+    }
+
+    @Test
+    void testAtualizarProdutoComErro() throws Exception {
+        IProdutoService service = Mockito.mock(ProdutoService.class);
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ProdutoController(service)).build();
+        String idProduto = "1";
+        when(service.updateProduto(anyLong(), any(DadosProdutoDto.class))).thenThrow(new RuntimeException());
+        DadosProdutoDto dadosProdutoDto = new DadosProdutoDto(produto);
+
+        mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT_API_PEDIDO_ATUALIZAR, idProduto)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(dadosProdutoDto)))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+        verify(service, times(1)).updateProduto(anyLong(), any(DadosProdutoDto.class));
+    }
+
+    @Test
+    void testDeletarProduto() throws Exception {
+        IProdutoService service = Mockito.mock(ProdutoService.class);
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ProdutoController(service)).build();
+        String idProduto = "1";
+
+        doNothing().when(service).deleteProduto(anyLong());
+
+        mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT_API_PEDIDO_DELETAR, idProduto)
+                .contentType(MediaType.APPLICATION_JSON)).andDo(print())
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+
+        verify(service, times(1)).deleteProduto(anyLong());
+    }
+
+    @Test
+    void testDeletarProdutoFailed() throws Exception {
+        IProdutoService service = Mockito.mock(ProdutoService.class);
+        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(new ProdutoController(service)).build();
+        String idProduto = "1";
+        doThrow(RuntimeException.class).when(service).deleteProduto(anyLong());
+
+        mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT_API_PEDIDO_DELETAR, idProduto)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+
+        verify(service, times(1)).deleteProduto(anyLong());
     }
 
     public static String asJsonString(final Object obj) {

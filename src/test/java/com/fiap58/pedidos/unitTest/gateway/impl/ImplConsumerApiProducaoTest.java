@@ -1,5 +1,6 @@
-package com.fiap58.pedidos.gateway.impl;
+package com.fiap58.pedidos.unitTest.gateway.impl;
 
+import com.fiap58.pedidos.gateway.impl.ImplConsumerApiProducao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
