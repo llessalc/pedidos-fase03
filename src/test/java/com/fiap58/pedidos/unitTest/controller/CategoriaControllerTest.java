@@ -23,11 +23,11 @@ import com.fiap58.pedidos.core.usecase.ICategoriaService;
 import com.fiap58.pedidos.presenters.dto.entrada.CategoriaDtoEntrada;
 import com.fiap58.pedidos.presenters.dto.saida.DadosCategoriaDto;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
+
 import org.springframework.http.MediaType;
 
 @SpringBootTest
@@ -110,6 +110,24 @@ public class CategoriaControllerTest {
                                                 .contentType(MediaType.APPLICATION_JSON)
                                                 .content(new ObjectMapper().writeValueAsString(categoriaDto)))
                                 .andExpect(MockMvcResultMatchers.status().isOk());
+
+        }
+
+        @Test
+        void testCadastraCategoriaNullFailed() throws Exception {
+                ICategoriaService service = Mockito.mock(CategoriaService.class);
+                mockMvc = MockMvcBuilders.standaloneSetup(new CategoriaController(service)).build();
+
+                CategoriaDtoEntrada categoriaDto = new CategoriaDtoEntrada("Categoria Teste");
+                DadosCategoriaDto savedCategoriaDto = new DadosCategoriaDto(1L, "CategoriaTeste");
+                // preencha o objeto dadosCate
+                Mockito.when(service.cadastrarCategoria(categoriaDto)).thenReturn(null);
+
+                mockMvc.perform(
+                        MockMvcRequestBuilders.post("/categoria")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(categoriaDto)))
+                        .andExpect(MockMvcResultMatchers.status().isNotFound());
 
         }
 

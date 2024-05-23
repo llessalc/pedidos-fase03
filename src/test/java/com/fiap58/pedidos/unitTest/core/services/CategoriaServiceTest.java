@@ -1,15 +1,16 @@
 package com.fiap58.pedidos.unitTest.core.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import com.fiap58.pedidos.core.domain.entity.Categoria;
@@ -37,6 +38,23 @@ public class CategoriaServiceTest {
     }
 
     @Test
+    void testRetornarCategoria() {
+        // Arrange
+        CategoriaRepository repository = Mockito.mock(CategoriaRepository.class);
+        CategoriaService service = new CategoriaService(repository);
+        Categoria expectedCategoria = new Categoria("Teste");
+        Long id = 1L;
+
+        Mockito.when(repository.getReferenceById(id)).thenReturn(expectedCategoria);
+
+        // Act
+        DadosCategoriaDto actualCategoria = service.retornarCategoria(id);
+
+        // Assert
+        assertEquals(expectedCategoria.getNomeCategoria(), actualCategoria.nomeCategoria());
+    }
+
+    @Test
     void testCadastrarCategoria() {
         // Arrange
         CategoriaRepository repository = Mockito.mock(CategoriaRepository.class);
@@ -50,6 +68,27 @@ public class CategoriaServiceTest {
 
         assertNotNull(actualCategoria);
         assertEquals(expectedCategoria.getNomeCategoria(), actualCategoria.getNomeCategoria());
+    }
+
+    @Test
+    void testCadastrarCategoriaJaCadastrada() {
+        // Arrange
+        CategoriaRepository repository = Mockito.mock(CategoriaRepository.class);
+        CategoriaService service = new CategoriaService(repository);
+
+
+        List<Categoria> categorias = new ArrayList<>();
+        Categoria expectedCategoria = new Categoria("Teste");
+        categorias.add(expectedCategoria);
+
+        CategoriaDtoEntrada dto = new CategoriaDtoEntrada("Teste");
+
+        Mockito.when(repository.findAll()).thenReturn(categorias);
+
+        // Act
+        DadosCategoriaDto actualCategoria = service.cadastrarCategoria(dto);
+
+        assertNull(actualCategoria);
     }
 
     @Test

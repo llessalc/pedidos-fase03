@@ -2,6 +2,7 @@ package com.fiap58.pedidos.unitTest.core.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -9,6 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.fiap58.pedidos.presenters.dto.entrada.DadosClienteCadastro;
+import com.fiap58.pedidos.presenters.dto.entrada.EnderecoCadastro;
+import com.fiap58.pedidos.presenters.dto.entrada.TelefoneCadastro;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -69,6 +73,39 @@ public class ClienteServiceTest {
         Cliente cliente = new Cliente();
         cliente.setNome("Teste");
 
+        Mockito.when(repository.save(Mockito.any(Cliente.class))).thenReturn(cliente);
+
+        // Act
+        Cliente result = service.cadastrarCliente(cliente);
+
+        // Assert
+        assertEquals(cliente, result);
+        Mockito.verify(repository, Mockito.times(1)).save(cliente);
+    }
+
+    @Test
+    void testCadastrarClienteDadosClienteCadastro() {
+        // Arrange
+        ClienteRepository repository = Mockito.mock(ClienteRepository.class);
+        IEnderecoService enderecoService = Mockito.mock(IEnderecoService.class);
+        ITelefoneService telefoneService = Mockito.mock(ITelefoneService.class);
+        ClienteService service = new ClienteService(repository, enderecoService, telefoneService);
+
+        List<EnderecoCadastro> enderecos = new ArrayList<>();
+        List<TelefoneCadastro> telefones = new ArrayList<>();
+
+        EnderecoCadastro enderecoCadastro =  new EnderecoCadastro("Rua", "1", "Cidade", "Estado", "Compl");
+        TelefoneCadastro telefoneCadastro =  new TelefoneCadastro("11","11111","Pessoal");
+
+        enderecos.add(enderecoCadastro);
+        telefones.add(telefoneCadastro);
+
+        new DadosClienteCadastro("1111", "Teste", enderecos, telefones);
+
+        Cliente cliente = new Cliente();
+        cliente.setNome("Teste");
+
+        Mockito.when(repository.findByCpf(anyString())).thenReturn(null);
         Mockito.when(repository.save(Mockito.any(Cliente.class))).thenReturn(cliente);
 
         // Act

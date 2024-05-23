@@ -52,7 +52,7 @@ public class CategoriaService implements ICategoriaService {
 
     private List<Categoria> recuperaCategoriasVigentes(List<Categoria> categorias) {
         return categorias.stream()
-                .filter(categoria -> categoria.getDeletadoEm() != null)
+                .filter(categoria -> categoria.getDeletadoEm() == null)
                 .collect(Collectors.toList());
     }
 

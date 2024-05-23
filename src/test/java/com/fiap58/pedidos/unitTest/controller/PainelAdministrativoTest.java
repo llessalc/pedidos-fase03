@@ -45,6 +45,7 @@ public class PainelAdministrativoTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
     public void testAtualizarStatusFailed() throws Exception {
         Long id = 1L;
 

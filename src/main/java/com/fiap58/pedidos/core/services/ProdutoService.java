@@ -36,7 +36,11 @@ public class ProdutoService implements IProdutoService {
 
     @Override
     public DadosProdutoDto retornaProduto(long id) {
-        return mapperDadosProdutoDto(verificaVigenciaProduto(buscarProduto(id)));
+        Produto produto = verificaVigenciaProduto(buscarProduto(id));
+        if(produto != null){
+            return mapperDadosProdutoDto(produto);
+        }
+        return null;
     }
 
     @Override
@@ -46,12 +50,21 @@ public class ProdutoService implements IProdutoService {
 
     @Override
     public List<DadosProdutoDto> retornaListaProdutos() {
-        return mapperListaProdutoDto(produtosVigentes(listarProdutos()));
+        List<Produto> produtos = produtosVigentes(listarProdutos());
+        if(produtos != null){
+            return mapperListaProdutoDto(produtos);
+        }
+        return null;
+
     }
 
     @Override
     public List<DadosProdutoDto> retornaListaProdutosCategoria(String nomeCategoria) {
-        return mapperListaProdutoDto(produtosVigentes(buscarProdutoPorCategoria(nomeCategoria)));
+        List<Produto> produtos = produtosVigentes(buscarProdutoPorCategoria(nomeCategoria));
+        if(produtos != null){
+            return mapperListaProdutoDto(produtos);
+        }
+        return null;
     }
 
     private List<DadosProdutoDto> mapperListaProdutoDto(List<Produto> produtoList) {
