@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 import java.time.Duration;
@@ -52,6 +53,10 @@ public class PedidoServiceTest {
 
     private Produto produto;
     private Categoria categoria;
+    private Produto produto2;
+    private Categoria categoria2;
+    private Produto produto3;
+    private Categoria categoria3;
     private Pedido pedidoMock;
     private Cliente cliente;
     private DadosClienteCadastro dadosClienteCadastro;
@@ -69,8 +74,19 @@ public class PedidoServiceTest {
 
         categoria = new Categoria("lanche");
         produto = new Produto("Produto1", "Descricao 1", new BigDecimal("10.00"));
+
+        categoria2 = new Categoria("acompanhamento");
+        produto2 = new Produto("Produto2", "Descricao 2", new BigDecimal("10.00"));
+
+        categoria3 = new Categoria("sobremesa");
+        produto3 = new Produto("Produto3", "Descricao 3", new BigDecimal("10.00"));
+
         produto.setIdProduto(100L);
         produto.setCategoria(categoria);
+        produto2.setIdProduto(200L);
+        produto2.setCategoria(categoria2);
+        produto3.setIdProduto(300L);
+        produto3.setCategoria(categoria3);
         dadosClienteCadastro = new DadosClienteCadastro("0000", "Cliente 1", null, null);
         cliente = new Cliente(dadosClienteCadastro);
         pedidoMock = new Pedido(10L, cliente);
@@ -127,6 +143,15 @@ public class PedidoServiceTest {
 
         verify(repository, times(1)).findById(anyLong());
         assertThat(dadosPedidosDto.getStatus()).isEqualTo(StatusPedido.EM_PREPARACAO);
+    }
+
+    @Test
+    @DisplayName("Atualiza pedido de RECEBIDO sem Pagamento - Erro")
+    void testAtualizarPedidoSemPagar() throws Exception {
+        boolean pagamentoRealizado = false;
+        when(repository.findById(anyLong())).thenReturn(Optional.ofNullable(pedidoMock));
+
+        assertThatThrownBy(()-> service.atualizarPedido(1L, pagamentoRealizado));
     }
 
     @Test
@@ -211,6 +236,31 @@ public class PedidoServiceTest {
 
     @Test
     void testRecebePagamento() throws Exception {
+        pedidoProduto.setQuantidade(1);
+        produtos.add(pedidoProduto);
+        PedidoProduto pedidoProduto2 = new PedidoProduto(2L, pedidoMock, produto2, 5, new BigDecimal("10.00"), "nenhuma");
+        produtos.add(pedidoProduto2);
+        PedidoProduto pedidoProduto3 = new PedidoProduto(3L, pedidoMock, produto3, 5, new BigDecimal("10.00"), "nenhuma");
+        produtos.add(pedidoProduto3);
+        pedidoMock.setProdutos(produtos);
+
+        when(repository.findById(anyLong())).thenReturn(Optional.ofNullable(pedidoMock));
+        pedidoMock.setStatus(StatusPedido.RECEBIDO);
+
+        DadosPedidosDto dadosPedidosDto = service.recebePagamento(1L);
+        assertThat(dadosPedidosDto.getStatus()).isEqualTo(StatusPedido.EM_PREPARACAO);
+        verify(repository, times(2)).findById(anyLong());
+    }
+
+    @Test
+    void testRecebePagamentoProdutosDiferentes() throws Exception {
+
+        PedidoProduto pedidoProduto2 = new PedidoProduto(2L, pedidoMock, produto2, 2, new BigDecimal("10.00"), "nenhuma");
+        produtos.add(pedidoProduto2);
+        PedidoProduto pedidoProduto3 = new PedidoProduto(3L, pedidoMock, produto3, 3, new BigDecimal("10.00"), "nenhuma");
+        produtos.add(pedidoProduto3);
+        pedidoMock.setProdutos(produtos);
+
         when(repository.findById(anyLong())).thenReturn(Optional.ofNullable(pedidoMock));
         pedidoMock.setStatus(StatusPedido.RECEBIDO);
 

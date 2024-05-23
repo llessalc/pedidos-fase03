@@ -51,7 +51,7 @@ public class ProdutoService implements IProdutoService {
     @Override
     public List<DadosProdutoDto> retornaListaProdutos() {
         List<Produto> produtos = produtosVigentes(listarProdutos());
-        if(produtos != null){
+        if(produtos.size() != 0){
             return mapperListaProdutoDto(produtos);
         }
         return null;

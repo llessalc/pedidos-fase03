@@ -20,8 +20,11 @@ import com.fiap58.pedidos.gateway.ClienteRepository;
 import com.fiap58.pedidos.gateway.ProdutoRepository;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosProdutoDtoEntrada;
 import com.fiap58.pedidos.presenters.dto.saida.DadosProdutoDto;
+import org.springframework.data.jpa.domain.Specification;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 
@@ -189,33 +192,55 @@ public class ProdutoServiceTest {
         List<DadosProdutoDto> result = service.retornaListaProdutos();
 
         // Assert
-        assertEquals(0, result.size());
+        assertNull(result);
 
     }
 
-//     @Test
-//     void testRetornaListaProdutosCategoria() {
-//         ProdutoRepository repository = Mockito.mock(ProdutoRepository.class);
-//         ICategoriaService categoriaService = Mockito.mock(ICategoriaService.class);
-//         ProdutoService service = new ProdutoService(repository, categoriaService);
-//
-//         Categoria categoria = new Categoria();
-//         categoria.setNomeCategoria("Teste Categoria");
-//         Produto produto1 = new Produto("Teste1", "Descricao", new BigDecimal(10));
-//         produto1.setCategoria(categoria);
-//         Produto produto2 = new Produto("Teste2", "Descricao2", new BigDecimal(10));
-//         produto2.setCategoria(categoria);
-//         List<Produto> produtos = Arrays.asList(produto1, produto2);
-//
-//         Mockito.when(repository.findByCategoriaNomeCategoria("Teste Categoria")).thenReturn(produtos);
-//
-//         // Act
-//         List<Produto> result = service.RetornaListaProdutosCategoria("Teste
-//         Categoria");
-//
-//         // Assert
-//         assertEquals(produtos, result);
-//     }
+     @Test
+     void testRetornaListaProdutosCategoria() {
+         ProdutoRepository repository = Mockito.mock(ProdutoRepository.class);
+         ICategoriaService categoriaService = Mockito.mock(ICategoriaService.class);
+         ProdutoService service = new ProdutoService(repository, categoriaService);
+
+         Categoria categoria = new Categoria();
+         categoria.setNomeCategoria("Teste Categoria");
+         Produto produto1 = new Produto("Teste1", "Descricao", new BigDecimal(10));
+         produto1.setCategoria(categoria);
+         Produto produto2 = new Produto("Teste2", "Descricao2", new BigDecimal(10));
+         produto2.setCategoria(categoria);
+         List<Produto> produtos = Arrays.asList(produto1, produto2);
+
+         Mockito.when(repository.findAll(any(Specification.class))).thenReturn(produtos);
+
+         List<DadosProdutoDto> testeCategoria = service.retornaListaProdutosCategoria("Teste Categoria");
+
+
+         assertThat(testeCategoria.size()).isEqualTo(2);
+     }
+
+    @Test
+    void testRetornaListaProdutosCategoriaSemVigencia() {
+        ProdutoRepository repository = Mockito.mock(ProdutoRepository.class);
+        ICategoriaService categoriaService = Mockito.mock(ICategoriaService.class);
+        ProdutoService service = new ProdutoService(repository, categoriaService);
+
+        Categoria categoria = new Categoria();
+        categoria.setNomeCategoria("Teste Categoria");
+        Produto produto1 = new Produto("Teste1", "Descricao", new BigDecimal(10));
+        produto1.setCategoria(categoria);
+        produto1.setDeletadoEm(Instant.now());
+        Produto produto2 = new Produto("Teste2", "Descricao2", new BigDecimal(10));
+        produto2.setCategoria(categoria);
+        produto2.setDeletadoEm(Instant.now());
+        List<Produto> produtos = Arrays.asList(produto1, produto2);
+
+        Mockito.when(repository.findAll(any(Specification.class))).thenReturn(produtos);
+
+        List<DadosProdutoDto> testeCategoria = service.retornaListaProdutosCategoria("Teste Categoria");
+
+
+        assertThat(testeCategoria.size()).isEqualTo(0);
+    }
 
 
 

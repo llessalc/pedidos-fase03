@@ -2,6 +2,7 @@ package com.fiap58.pedidos.unitTest.core.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -73,7 +74,7 @@ public class ClienteServiceTest {
         Cliente cliente = new Cliente();
         cliente.setNome("Teste");
 
-        Mockito.when(repository.save(Mockito.any(Cliente.class))).thenReturn(cliente);
+        Mockito.when(repository.save(any(Cliente.class))).thenReturn(cliente);
 
         // Act
         Cliente result = service.cadastrarCliente(cliente);
@@ -100,20 +101,21 @@ public class ClienteServiceTest {
         enderecos.add(enderecoCadastro);
         telefones.add(telefoneCadastro);
 
-        new DadosClienteCadastro("1111", "Teste", enderecos, telefones);
+        DadosClienteCadastro dto = new DadosClienteCadastro("1111", "Teste", enderecos, telefones);
+
 
         Cliente cliente = new Cliente();
         cliente.setNome("Teste");
 
         Mockito.when(repository.findByCpf(anyString())).thenReturn(null);
-        Mockito.when(repository.save(Mockito.any(Cliente.class))).thenReturn(cliente);
+        Mockito.when(repository.save(any(Cliente.class))).thenReturn(cliente);
 
         // Act
-        Cliente result = service.cadastrarCliente(cliente);
+        DadosClienteDto result = service.cadastrarCliente(dto);
 
         // Assert
-        assertEquals(cliente, result);
-        Mockito.verify(repository, Mockito.times(1)).save(cliente);
+        assertEquals(cliente.getNome(), result.nome());
+        Mockito.verify(repository, Mockito.times(1)).save(any(Cliente.class));
     }
 
     @Test
