@@ -1,0 +1,21 @@
+myapp
+├── src
+│   └── main
+│       └── java
+│           └── com
+│               └── example
+│                   ├── application
+│                   │   ├── ports
+│                   │   │   └── PedidoUseCase.java (Interface para o serviço de aplicação)
+│                   │   └── adapters
+│                   │       └── PedidoController.java (Adapter de entrada: Controlador REST)
+│                   ├── domain
+│                   │   ├── Pedido.java (Entidade de domínio)
+│                   │   ├── ports
+│                   │   │   └── PedidoRepository.java (Interface para o repositório)
+│                   │   └── services
+│                   │       └── PedidoServiceImpl.java (Implementação do serviço de domínio)
+│                   └── infrastructure
+│                       └── adapters
+│                           └── PedidoRepositoryImpl.java (Adapter de saída: Implementação do repositório)
+└── pom.xml
