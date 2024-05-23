@@ -239,7 +239,7 @@ public class ProdutoServiceTest {
 
          Mockito.when(repository.getReferenceById(anyLong())).thenReturn(produto);
          Mockito.when(repository.save(Mockito.any(Produto.class))).thenReturn(produto);
-         
+
 
          // Act
          Produto result = service.updateProduto(id, dto);
