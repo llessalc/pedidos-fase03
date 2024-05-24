@@ -5,15 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 
-@JsonIgnoreProperties({"produtos"})
+@JsonIgnoreProperties({ "produtos" })
 @Entity
 @Table(name = "Pedidos")
 @Getter
@@ -24,8 +21,8 @@ public class Pedido {
     @Column(name = "ID_PEDIDO")
     private Long idPedido;
 
-    public Pedido(){};
-
+    public Pedido() {
+    };
 
     @ManyToOne
     @JoinColumn(name = "ID_CLIENTE")

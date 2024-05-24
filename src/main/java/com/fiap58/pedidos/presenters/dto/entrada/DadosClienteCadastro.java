@@ -1,12 +1,26 @@
 package com.fiap58.pedidos.presenters.dto.entrada;
 
-import com.fiap58.pedidos.core.domain.entity.Endereco;
-import com.fiap58.pedidos.core.domain.entity.Telefone;
-
 import java.util.List;
 
-public record DadosClienteCadastro(String cpf,
-                                   String nome,
-                                   List<EnderecoCadastro> enderecos,
-                                   List<TelefoneCadastro> telefones) {
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record DadosClienteCadastro(
+        @JsonProperty("cpf") String cpf,
+        @JsonProperty("nome") String nome,
+        @JsonProperty("enderecos") List<EnderecoCadastro> enderecos,
+        @JsonProperty("telefones") List<TelefoneCadastro> telefones) {
+    @JsonCreator
+    public DadosClienteCadastro {
+        // O corpo do construtor é vazio porque os campos são final e inicializados
+        // diretamente
+    }
+
+    public String getCpf() {
+        return this.cpf;
+    }
+
+    public String getNome() {
+        return this.nome;
+    }
 }

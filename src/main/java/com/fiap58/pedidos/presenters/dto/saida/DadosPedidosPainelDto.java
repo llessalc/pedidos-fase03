@@ -19,7 +19,26 @@ public class DadosPedidosPainelDto {
     private StatusPedido status;
     private long tempoEspera;
 
-    public DadosPedidosPainelDto(DadosPedidosDto dadosPedidosDto, long tempoEspera){
+    public void setTempoEspera(long tempoEspera) {
+        this.tempoEspera = tempoEspera;
+    }
+
+    private Erro erro;
+
+    public static class Erro {
+        private String mensagemErro;
+
+        public String getMensagemErro() {
+            return mensagemErro;
+        }
+
+        public void setMensagemErro(String mensagemErro) {
+            this.mensagemErro = mensagemErro;
+        }
+
+    }
+
+    public DadosPedidosPainelDto(DadosPedidosDto dadosPedidosDto, long tempoEspera) {
         this.id = dadosPedidosDto.getId();
         this.produtos = dadosPedidosDto.getProdutos();
         this.nomeCliente = dadosPedidosDto.getNomeCliente();
