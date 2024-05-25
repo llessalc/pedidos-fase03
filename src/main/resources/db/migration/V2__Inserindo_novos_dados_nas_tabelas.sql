@@ -20,7 +20,7 @@ VALUES (1, 1, 'X-BURGUER', 'Pão, hambúrguer 120gr, alface, tomate, picles e mo
 
 -- Inserir dados na tabela Pedidos
 INSERT INTO Pedidos (ID_PEDIDO, ID_CLIENTE, DATA_PEDIDO, DATA_FINALIZADO, STATUS)
-VALUES (1, 1,'2023-10-17 12:00:00', '2023-10-18 14:30:00', 'Finalizado');
+VALUES (1, 1,'2023-10-17 12:00:00', '2023-10-18 14:30:00', 'FINALIZADO');
 
 -- Inserir dados na tabela Pedido_Produto
 INSERT INTO Pedido_Produto (ID_PEDIDO_PRODUTO, ID_PEDIDO, ID_PRODUTO, QUANTIDADE, PRECO_VENDA, OBSERVACAO)
