@@ -8,11 +8,11 @@ VALUES (2, '0123020202', 'Sicrano', '2023-10-21 12:00:00', '2023-10-21 12:00:00'
 
 -- Inserir dados na tabela Pedidos
 INSERT INTO Pedidos (ID_PEDIDO, ID_CLIENTE, DATA_PEDIDO, DATA_FINALIZADO, STATUS)
-VALUES (2, 1,'2023-10-21 12:00:00', null, 'Recebido');
+VALUES (2, 1,'2023-10-21 12:00:00', null, 'RECEBIDO');
 
 -- Inserir dados na tabela Pedidos
 INSERT INTO Pedidos (ID_PEDIDO, ID_CLIENTE, DATA_PEDIDO, DATA_FINALIZADO, STATUS)
-VALUES (3, 2,'2023-10-21 12:02:00', null, 'Recebido');
+VALUES (3, 2,'2023-10-21 12:02:00', null, 'RECEBIDO');
 
 -- Inserir dados na tabela Pedido_Produto
 INSERT INTO Pedido_Produto (ID_PEDIDO_PRODUTO, ID_PEDIDO, ID_PRODUTO, QUANTIDADE, PRECO_VENDA, OBSERVACAO)
