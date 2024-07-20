@@ -88,13 +88,12 @@ Gerencia a retirada do pedido pelo cliente.
 
 1. **Pedido Criado**: Serviço de Pedido cria um novo pedido.
 2. **Pagamento Processado**: Serviço de Pagamento processa o pagamento.
-3. **Preparação na Cozinha**: Serviço de Cozinha prepara o pedido.
-4. **Pedido Pronto**: Serviço de Notificações informa o cliente.
-5. **Retirada do Pedido**: Serviço de Retirada do Pedido gerencia a entrega.
+3. **Status Pedido**: Serviço de Notificações informa o cliente.
+4. **Retirada do Pedido**: Serviço de Retirada do Pedido gerencia a entrega.
 
 ### 4.2 Diagrama de Sequência
 
-![Diagrama de Sequência](https://example.com/diagrama_sequencia.png)
+![Diagrama de Sequência](./out/plantuml/diagramasequence/diagramasequence.png)
 
 ### 4.3 Detalhes das Transações e Compensações
 
