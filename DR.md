@@ -21,9 +21,9 @@ O escopo deste documento inclui a descrição dos serviços, fluxo do pedido, e 
 
 O sistema de pedidos do restaurante é composto por vários componentes interconectados que gerenciam diferentes partes do processo de pedido. Os principais componentes incluem:
 
-    * Pedido: Responsável por capturar e armazenar os detalhes do pedido do cliente.
-    * Pagamento: Gerencia o processamento de pagamentos e integração com sistemas
-      externos, como Mercado Livre.
+- Pedido: Responsável por capturar e armazenar os detalhes do pedido do cliente.
+- Pagamento: Gerencia o processamento de pagamentos e integração com sistemas
+  externos, como Mercado Livre.
 
 ### 2.1 Descrição do Sistema
 
@@ -48,13 +48,77 @@ Cliente -> [Sistema de Pedido] -> [Processamento de Pagamento] -> [Sistema de Pe
 
 ### 2.3 Diagrama de Contexto
 
-![Diagrama de Contexto](https://example.com/diagrama_contexto.png)
+#### Pagamento Confirmado
+
+![Diagrama de Contexto](./out/img/saga_pedidos-happy-path.drawio.png)
+
+<hr />
+
+#### Pagamento Cancelado
+
+![Diagrama de Contexto](./out/img/saga_pedidos-pagamento-cancelado.drawio.png)
 
 ## 3. Arquitetura do Sistema
 
 ### 3.1 Diagrama de Componentes
 
-![Diagrama de Componentes](https://example.com/diagrama_componentes.png)
+```
++---------------------+
+| Sistema de Pedido   |
+| +---------------+   |
+| | Pedido        |   |
+| +---------------+   |
++---------+-----------+
+          |
+          v
++---------------------+
+| Processamento de    |
+| Pagamento           |
+| +---------------+   |
+| | Pagamento     |   |
+| +---------------+   |
++---------+-----------+
+          |
+          v
++---------------------+
+| Integração com      |
+| Sistema Externo     |
+| +---------------+   |
+| | MercadoLivre  |   |
+| +---------------+   |
++---------+-----------+
+          |
+          v
++---------------------+
+| Processamento de    |
+| Pagamento           |
+| +---------------+   |
+| | Pagamento     |   |
+| +---------------+   |
++---------+-----------+
+          |
+          v
++---------------------+
+| Sistema de Pedido   |
+| +---------------+   |
+| | Pedido        |   |
+| +---------------+   |
++---------+-----------+
+          |
+          v
++---------------------+
+| Retirada            |
+| +---------------+   |
+| | Retirada      |   |
+| +---------------+   |
++---------+-----------+
+          |
+          v
++---------------------+
+| Cliente             |
++---------------------+
+
+```
 
 ### 3.2 Descrição dos Componentes
 
@@ -113,10 +177,9 @@ Gerencia a retirada do pedido pelo cliente.
 
 - Não requer compensação direta, mas notificações e rastreamentos são essenciais.
 
-### 4.4 Orquestração vs. Coreografia
+### Fluxo com o Padrao Saga
 
-- **Orquestração**: Um serviço central (Saga Orchestrator) coordena as etapas do processo.
-- **Coreografia**: Cada serviço reage aos eventos e se coordena com os outros serviços.
+![Diagrama de Sequência](./out/img/SagaFluxo.png)
 
 ## 5. Detalhes Técnicos
 
