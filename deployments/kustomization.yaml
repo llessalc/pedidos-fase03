@@ -1,0 +1,7 @@
+secretGenerator:
+  - name: mysql-pass
+    literals:
+      - password=DB_PASS
+resources:
+  - app-pedidos-deployment.yaml
+  - app-pedidos-hpa.yaml

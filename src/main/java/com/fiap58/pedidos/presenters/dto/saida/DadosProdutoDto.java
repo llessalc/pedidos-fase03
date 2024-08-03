@@ -1,11 +1,13 @@
 package com.fiap58.pedidos.presenters.dto.saida;
 
-import com.fiap58.pedidos.core.domain.entity.Categoria;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fiap58.pedidos.core.domain.entity.Produto;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 
+@JsonSerialize
+@JsonDeserialize
 public record DadosProdutoDto(
         String nome,
         String descricao,
@@ -13,7 +15,7 @@ public record DadosProdutoDto(
         BigDecimal precoAtual
 
 ) {
-    public DadosProdutoDto(Produto produto){
+    public DadosProdutoDto(Produto produto) {
         this(produto.getNome(), produto.getDescricao(),
                 produto.getCategoria().getNomeCategoria(), produto.getPrecoAtual());
     }

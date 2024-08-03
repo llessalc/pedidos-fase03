@@ -21,19 +21,38 @@ public class DadosPedidosValorDto {
     private Instant dataPedido;
     private StatusPedido status;
 
-    public DadosPedidosValorDto(Pedido pedido, List<PedidoProduto> pedidoProdutos){
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setProdutos(List<ProdutoCarrinhoValor> produtos) {
+        this.produtos = produtos;
+    }
+
+    public void setNomeCliente(String nomeCliente) {
+        this.nomeCliente = nomeCliente;
+    }
+
+    public void setDataPedido(Instant dataPedido) {
+        this.dataPedido = dataPedido;
+    }
+
+    public void setStatus(StatusPedido status) {
+        this.status = status;
+    }
+
+    public DadosPedidosValorDto(Pedido pedido, List<PedidoProduto> pedidoProdutos) {
         this.id = pedido.getIdPedido();
         this.dataPedido = pedido.getDataPedido();
         this.produtos = this.retornaCarrinho(pedidoProdutos);
-        if(pedido.getCliente() != null)
+        if (pedido.getCliente() != null)
             this.nomeCliente = pedido.getCliente().getNome();
         this.status = pedido.getStatus();
     }
 
-    public List<ProdutoCarrinhoValor> retornaCarrinho(List<PedidoProduto> pedidoProdutos){
+    public List<ProdutoCarrinhoValor> retornaCarrinho(List<PedidoProduto> pedidoProdutos) {
         List<ProdutoCarrinhoValor> produtos = new ArrayList<>();
-        for (PedidoProduto pedidoProduto : pedidoProdutos
-        ) {
+        for (PedidoProduto pedidoProduto : pedidoProdutos) {
             produtos.add(new ProdutoCarrinhoValor(pedidoProduto));
         }
         return produtos;

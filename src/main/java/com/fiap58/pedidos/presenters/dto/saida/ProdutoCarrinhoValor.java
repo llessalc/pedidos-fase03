@@ -3,8 +3,6 @@ package com.fiap58.pedidos.presenters.dto.saida;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fiap58.pedidos.core.domain.entity.PedidoProduto;
 
-import java.math.BigDecimal;
-
 public record ProdutoCarrinhoValor(
 
         @JsonIgnore
