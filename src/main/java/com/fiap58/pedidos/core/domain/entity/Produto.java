@@ -24,8 +24,6 @@ public class Produto {
     @Column(name = "ID_PRODUTO")
     private Long idProduto;
 
-    @Getter
-    @Setter
     @ManyToOne
     @JoinColumn(name = "ID_CATEGORIA")
     private Categoria categoria;

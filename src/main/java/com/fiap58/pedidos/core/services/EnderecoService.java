@@ -9,6 +9,9 @@ import com.fiap58.pedidos.presenters.dto.saida.DadosEnderecoDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.List;
+
 @Service
 public class EnderecoService implements IEnderecoService {
 
@@ -24,6 +27,20 @@ public class EnderecoService implements IEnderecoService {
         endereco.setCliente(cliente);
         Endereco enderecoSalvo = repository.save(endereco);
         return new DadosEnderecoDto(enderecoSalvo);
+    }
+
+    public void excluirEndereco(Long idCliente){
+        List<Endereco> listaEnderecoCliente = repository.findByIdCliente(idCliente);
+        for(Endereco endereco : listaEnderecoCliente){
+            endereco.setAtualizadoEm(Instant.now());
+            endereco.setDeletadoEm(Instant.now());
+            repository.save(endereco);
+        }
+    }
+
+    @Override
+    public List<Endereco> listarEnderecoCliente(Long idCliente) {
+        return repository.findByIdCliente(idCliente);
     }
 
 }

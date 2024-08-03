@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.fiap58.pedidos.core.usecase.IPedidoService;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosClienteCadastro;
 import com.fiap58.pedidos.presenters.dto.entrada.EnderecoCadastro;
 import com.fiap58.pedidos.presenters.dto.entrada.TelefoneCadastro;

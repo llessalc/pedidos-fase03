@@ -8,11 +8,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-import com.fiap58.pedidos.gateway.impl.ImplConsumerApiProducao;
+import com.fiap58.pedidos.gateway.impl.QueuePublisher;
+import com.fiap58.pedidos.presenters.dto.entrada.BuscaClienteDto;
+import com.fiap58.pedidos.presenters.dto.entrada.PagamentoDto;
 import com.fiap58.pedidos.presenters.dto.saida.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.fiap58.pedidos.core.domain.entity.Cliente;
@@ -50,7 +53,10 @@ public class PedidoService implements IPedidoService {
     private ImplConsumerApiPagamentos consumerApiPagamentos;
 
     @Autowired
-    private ImplConsumerApiProducao consumerApiProducao;
+    private QueuePublisher queuePublisher;
+
+    @Autowired
+    private Environment environment;
 
     @Override
     public DadosPedidosDto inserirPedidoFila(DadosPedidosEntrada dto) {
@@ -63,16 +69,18 @@ public class PedidoService implements IPedidoService {
         Pedido pedido = new Pedido(null, cliente);
         Pedido pedidoCriado = repository.save(pedido);
         List<PedidoProduto> pedidosProdutos = processaCarrinhoPedido(dto.carrinho(), pedidoCriado);
-        consumerApiPagamentos.acionaCriarPagamento(pedido.getIdPedido());
-        List<DadosProdutoProducao> produtos = new ArrayList<>();
-        for (PedidoProduto pedidoProduto : pedidosProdutos){
-            produtos.add(new DadosProdutoProducao(pedidoProduto));
+
+        DadosPedidosDto dadosPedidosDto = new DadosPedidosDto(pedidoCriado, pedidosProdutos);
+
+        List<ProdutoCarrinhoSaida> produtos = dadosPedidosDto.getProdutos();
+        List<ProdutoCarrinhoPagamento> produtosPagamentos = new ArrayList<>();
+        for(ProdutoCarrinhoSaida prod : produtos){
+            produtosPagamentos.add(new ProdutoCarrinhoPagamento(prod));
         }
 
-        DadosPedidoSaida dadosPedidoSaida = new DadosPedidoSaida(pedidoCriado.getIdPedido(), produtos);
+        queuePublisher.publicarPedidoCriado(new DadosPedidoPagamento(dadosPedidosDto, produtosPagamentos));
 
-        consumerApiProducao.acionaCriarPedidoProducao(dadosPedidoSaida);
-        return new DadosPedidosDto(pedido, pedidosProdutos);
+        return dadosPedidosDto;
     }
 
     private List<PedidoProduto> processaCarrinhoPedido(List<ProdutoCarrinho> carrinhoProdutos,
@@ -135,10 +143,21 @@ public class PedidoService implements IPedidoService {
     public DadosPedidosDto atualizarPedido(Long id, Boolean pagamentoRealizado) throws Exception {
         Pedido pedido = this.retornaPedido(id);
         if (pedido.getStatus().equals(StatusPedido.RECEBIDO)) {
-            verificaPagamento(pagamentoRealizado);
+            if(pagamentoRealizado){
+                DadosPedidoSaida dadosPedidoSaida = mapperDadosPedidoSaida(pedido);
+                queuePublisher.publicarPedidoProducao(dadosPedidoSaida);
+                pedido.setStatus(StatusPedido.EM_PREPARACAO);
+            }
+            repository.save(pedido);
+            return mapperDadosPedidoDto(pedido);
+        } else {
+            defineProximoStatus(pedido);
+            if(pedido.getStatus().equals(StatusPedido.FINALIZADO)){
+                queuePublisher.publicarFinalizacaoPedido(new PedidoFinalizadoDto(pedido.getIdPedido()));
+            }
+            repository.save(pedido);
+            return mapperDadosPedidoDto(pedido);
         }
-        defineProximoStatus(pedido);
-        return mapperDadosPedidoDto(pedido);
     }
 
     private void defineProximoStatus(Pedido pedido) {
@@ -152,11 +171,14 @@ public class PedidoService implements IPedidoService {
         }
     }
 
-    private void verificaPagamento(Boolean pagamentoRealizado) throws Exception {
-        // Fazer lógica para verificação de pagamento
-        if (pagamentoRealizado)
-            return;
-        throw new Exception("Pagamento não identificado");
+
+    private DadosPedidoSaida mapperDadosPedidoSaida(Pedido pedido){
+        List<PedidoProduto> pedidoProdutoList = pedidoProdutoService.retornaPedidoProduto(pedido.getIdPedido());
+        List<DadosProdutoProducao> produtos =  new ArrayList<>();
+        for(PedidoProduto pedidoProduto : pedidoProdutoList){
+            produtos.add(new DadosProdutoProducao(pedidoProduto));
+        }
+        return new DadosPedidoSaida(pedido.getIdPedido(), produtos);
     }
 
     @Override
@@ -231,5 +253,43 @@ public class PedidoService implements IPedidoService {
     @Override
     public DadosPedidosValorDto buscaPedido(Long id) {
         return mapperDadosPedidoValor(retornaPedido(id));
+    }
+
+    @Override
+    public void excluiPedido(Long id){
+        Pedido pedido = this.retornaPedido(id);
+        pedido.setDataFinalizado(Instant.now());
+        pedido.setStatus(StatusPedido.CANCELADO);
+        repository.save(pedido);
+    }
+
+    @Override
+    public List<PagamentoDto> retornaPedidosCliente(BuscaClienteDto dto) {
+        Cliente cliente = new Cliente();
+        if(dto.cpf() != null){
+            cliente = clienteService.buscarClientePorCpf(dto.cpf());
+        } else {
+            cliente = clienteService.buscarClientePorNome(dto.nome());
+        }
+        if(cliente != null){
+            List<Pedido> pedidos = repository.findByIdCliente(cliente.getIdCliente());
+
+            List<PagamentoDto> pagamentos = new ArrayList<>();
+            for(Pedido pedido : pedidos){
+                PagamentoDto pagamentoDto = consumerApiPagamentos.acionaListarPagamentoId(pedido.getIdPedido());
+                if(pagamentoDto != null){
+                    pagamentos.add(pagamentoDto);
+                }
+            }
+
+            return pagamentos;
+        }
+        return null;
+    }
+
+    @Override
+    public void excluirPagamentosCliente(List<PagamentoDto> pagamentos) {
+        if(pagamentos != null)
+            consumerApiPagamentos.acionaExcluirPagamento(pagamentos);
     }
 }

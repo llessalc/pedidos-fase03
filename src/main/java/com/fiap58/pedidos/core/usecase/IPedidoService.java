@@ -4,7 +4,9 @@ import java.util.List;
 
 import com.fiap58.pedidos.core.domain.entity.Pedido;
 import com.fiap58.pedidos.core.domain.entity.PedidoProduto;
+import com.fiap58.pedidos.presenters.dto.entrada.BuscaClienteDto;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosPedidosEntrada;
+import com.fiap58.pedidos.presenters.dto.entrada.PagamentoDto;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosDto;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosPainelDto;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosValorDto;
@@ -27,4 +29,9 @@ public interface IPedidoService {
 
     DadosPedidosValorDto buscaPedido(Long id);
 
+    void excluiPedido(Long id);
+
+    List<PagamentoDto> retornaPedidosCliente(BuscaClienteDto dadosClienteExclusaoDto);
+
+    void excluirPagamentosCliente(List<PagamentoDto> pagamentos);
 }
