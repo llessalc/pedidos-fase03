@@ -28,14 +28,10 @@ public class ClienteController {
     private final IClienteService service;
 
 
-    private final IEnderecoService enderecoService;
-    private final ITelefoneService telefoneService;
     private final IPedidoService pedidoService;
 
-    public ClienteController(IClienteService _service, IEnderecoService enderecoService, ITelefoneService telefoneService, IPedidoService pedidoService) {
+    public ClienteController(IClienteService _service, IPedidoService pedidoService) {
         this.service = _service;
-        this.enderecoService = enderecoService;
-        this.telefoneService = telefoneService;
         this.pedidoService = pedidoService;
     }
 
@@ -104,15 +100,4 @@ public class ClienteController {
         }
         return ResponseEntity.notFound().build();
     }
-
-    @GetMapping("enderecos/{id}")
-    public ResponseEntity<List<Endereco>> listarEnderecoCliente(@PathVariable Long id){
-        return ResponseEntity.ok().body(enderecoService.listarEnderecoCliente(id));
-    }
-
-    @GetMapping("telefones/{id}")
-    public ResponseEntity<List<Telefone>> listarTelefonesCliente(@PathVariable Long id){
-        return ResponseEntity.ok().body(telefoneService.listaTelefoneCliente(id));
-    }
-
 }
