@@ -1,11 +1,12 @@
 package com.fiap58.pedidos.unitTest.controller;
 
+import com.fiap58.pedidos.gateway.impl.QueueConsumer;
+import com.fiap58.pedidos.gateway.impl.QueuePublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,18 +35,31 @@ import org.springframework.http.MediaType;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 public class CategoriaControllerTest {
+
+        @Mock
+        private ICategoriaService service;
+
         @Autowired
         private MockMvc mockMvc;
 
         @Autowired
         private ObjectMapper objectMapper;
 
+        @InjectMocks
+        private CategoriaController controller;
+
         @MockBean
-        private ICategoriaService service;
+        private QueuePublisher queuePublisher;
+
+        @MockBean
+        private QueueConsumer queueConsumer;
+
+
 
         @BeforeEach
         public void setup() {
-                MockitoAnnotations.openMocks(this);
+                mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+
         }
 
         @Test

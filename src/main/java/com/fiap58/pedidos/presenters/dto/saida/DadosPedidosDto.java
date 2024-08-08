@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class DadosPedidosDto {
-    @JsonIgnore
+
     private Long id;
     private List<ProdutoCarrinhoSaida> produtos;
     private String nomeCliente = "";

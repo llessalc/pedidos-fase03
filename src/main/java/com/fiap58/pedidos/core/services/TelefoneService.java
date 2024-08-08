@@ -8,6 +8,9 @@ import com.fiap58.pedidos.presenters.dto.entrada.TelefoneCadastro;
 import com.fiap58.pedidos.presenters.dto.saida.DadosTelefoneDto;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.List;
+
 @Service
 public class TelefoneService implements ITelefoneService {
 
@@ -24,6 +27,22 @@ public class TelefoneService implements ITelefoneService {
         telefone.setCliente(cliente);
         return mapperTelefoneDto(repository.save(telefone));
     }
+
+    @Override
+    public void excluirTelefoneCliente(Long idCliente) {
+        List<Telefone> listaTelefoneCliente = repository.findByIdCliente(idCliente);
+        for (Telefone telefone : listaTelefoneCliente) {
+            telefone.setAtualizadoEm(Instant.now());
+            telefone.setDeletadoEm(Instant.now());
+            repository.save(telefone);
+        }
+    }
+
+    @Override
+    public List<Telefone> listaTelefoneCliente(Long idCliente) {
+        return repository.findByIdCliente(idCliente);
+    }
+
 
     private DadosTelefoneDto mapperTelefoneDto(Telefone telefone) {
 

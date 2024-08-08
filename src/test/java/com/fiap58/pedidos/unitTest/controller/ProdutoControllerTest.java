@@ -6,8 +6,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.fiap58.pedidos.core.domain.entity.Categoria;
+import com.fiap58.pedidos.gateway.impl.QueueConsumer;
+import com.fiap58.pedidos.gateway.impl.QueuePublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +43,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 public class ProdutoControllerTest {
@@ -49,8 +53,17 @@ public class ProdutoControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @Mock
     private IProdutoService service;
+
+    @InjectMocks
+    private ProdutoController controller;
+
+    @MockBean
+    private QueuePublisher queuePublisher;
+
+    @MockBean
+    private QueueConsumer queueConsumer;
 
     private final String ENDPOINT_API_PEDIDO_INSERIR = "http://localhost:8080/produto";
     private final String ENDPOINT_API_PEDIDO_ATUALIZAR = "http://localhost:8080/produto/{idProduto}";
@@ -61,7 +74,7 @@ public class ProdutoControllerTest {
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.openMocks(this);
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         categoria = new Categoria("lanche");
         produto = new Produto("Produto1", "Descricao 1", new BigDecimal("10.00"));
         produto.setIdProduto(100L);

@@ -7,6 +7,8 @@ import com.fiap58.pedidos.core.services.ClienteService;
 import com.fiap58.pedidos.core.services.PedidoService;
 import com.fiap58.pedidos.core.usecase.IClienteService;
 import com.fiap58.pedidos.core.usecase.IPedidoService;
+import com.fiap58.pedidos.gateway.impl.QueueConsumer;
+import com.fiap58.pedidos.gateway.impl.QueuePublisher;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosClienteCadastro;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosPedidosEntrada;
 import com.fiap58.pedidos.presenters.dto.entrada.EnderecoCadastro;
@@ -20,12 +22,14 @@ import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosValorDto;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -51,18 +55,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class PedidoControllerTest {
 
-        @Autowired
-        private MockMvc mockMvc;
-
         @Mock
         private IPedidoService pedidoService;
 
         @Autowired
+        private MockMvc mockMvc;
+
+        @Autowired
         private ObjectMapper objectMapper;
+
+        @InjectMocks
+        private PedidoControllerTest controller;
+
+        @MockBean
+        private QueuePublisher queuePublisher;
+
+        @MockBean
+        private QueueConsumer queueConsumer;
 
         @BeforeEach
         public void setup() {
-                MockitoAnnotations.openMocks(this);
+                mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         }
 
         @Test

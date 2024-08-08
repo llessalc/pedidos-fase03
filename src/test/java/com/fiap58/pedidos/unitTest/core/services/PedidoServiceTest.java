@@ -7,10 +7,9 @@ import com.fiap58.pedidos.core.usecase.IPedidoProdutoService;
 import com.fiap58.pedidos.core.usecase.IProdutoService;
 import com.fiap58.pedidos.gateway.PedidoRepository;
 import com.fiap58.pedidos.gateway.impl.ImplConsumerApiPagamentos;
-import com.fiap58.pedidos.gateway.impl.ImplConsumerApiProducao;
-import com.fiap58.pedidos.presenters.dto.entrada.DadosClienteCadastro;
-import com.fiap58.pedidos.presenters.dto.entrada.DadosPedidosEntrada;
-import com.fiap58.pedidos.presenters.dto.entrada.ProdutoCarrinho;
+import com.fiap58.pedidos.gateway.impl.QueuePublisher;
+import com.fiap58.pedidos.presenters.dto.entrada.*;
+import com.fiap58.pedidos.presenters.dto.saida.DadosPedidoPagamento;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosDto;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosPainelDto;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosValorDto;
@@ -21,17 +20,20 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Optional;
-
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class PedidoServiceTest {
 
@@ -46,7 +48,9 @@ public class PedidoServiceTest {
     @Mock
     private ImplConsumerApiPagamentos consumerApiPagamentos;
     @Mock
-    private ImplConsumerApiProducao consumerApiProducao;
+    private QueuePublisher queuePublisher;
+    @Mock
+    private Environment environment;
 
     AutoCloseable openMocks;
     private PedidoService service;
@@ -70,7 +74,7 @@ public class PedidoServiceTest {
     @BeforeEach
     void setup(){
         openMocks = MockitoAnnotations.openMocks(this);
-        service = new PedidoService(repository, clienteService, produtoService, pedidoProdutoService, consumerApiPagamentos, consumerApiProducao);
+        service = new PedidoService(repository, clienteService, produtoService, pedidoProdutoService, consumerApiPagamentos, queuePublisher, environment);
 
         categoria = new Categoria("lanche");
         produto = new Produto("Produto1", "Descricao 1", new BigDecimal("10.00"));
@@ -109,9 +113,10 @@ public class PedidoServiceTest {
     @DisplayName("Inserindo pedido na fila sem identificar cliente")
     void testInserirPedidoFila() {
         when(repository.save(any(Pedido.class))).thenReturn(pedidoMock);
-        doNothing().when(consumerApiPagamentos).acionaCriarPagamento(anyLong());
         when(produtoService.buscarProduto(anyLong())).thenReturn(produto);
         doNothing().when(pedidoProdutoService).inserirPedidoProduto(any(PedidoProduto.class));
+        doNothing().when(queuePublisher).publicarPedidoCriado(any(DadosPedidoPagamento.class));
+
         DadosPedidosDto dadosPedidosDto = service.inserirPedidoFila(dadosPedidosEntrada);
 
         assertThat(dadosPedidosDto.getProdutos().get(0).idProduto()).isEqualTo(100L);
@@ -124,9 +129,10 @@ public class PedidoServiceTest {
         DadosPedidosEntrada dadosPedidosEntradaCliente = new DadosPedidosEntrada(produtoCarrinhoList, 10L);
         when(repository.save(any(Pedido.class))).thenReturn(pedidoMock);
         when(clienteService.buscarClientePorId(anyLong())).thenReturn(cliente);
-        doNothing().when(consumerApiPagamentos).acionaCriarPagamento(anyLong());
         when(produtoService.buscarProduto(anyLong())).thenReturn(produto);
         doNothing().when(pedidoProdutoService).inserirPedidoProduto(any(PedidoProduto.class));
+        doNothing().when(queuePublisher).publicarPedidoCriado(any(DadosPedidoPagamento.class));
+
         DadosPedidosDto dadosPedidosDto = service.inserirPedidoFila(dadosPedidosEntradaCliente);
 
         assertThat(dadosPedidosDto.getProdutos().get(0).idProduto()).isEqualTo(100L);
@@ -143,15 +149,6 @@ public class PedidoServiceTest {
 
         verify(repository, times(1)).findById(anyLong());
         assertThat(dadosPedidosDto.getStatus()).isEqualTo(StatusPedido.EM_PREPARACAO);
-    }
-
-    @Test
-    @DisplayName("Atualiza pedido de RECEBIDO sem Pagamento - Erro")
-    void testAtualizarPedidoSemPagar() throws Exception {
-        boolean pagamentoRealizado = false;
-        when(repository.findById(anyLong())).thenReturn(Optional.ofNullable(pedidoMock));
-
-        assertThatThrownBy(()-> service.atualizarPedido(1L, pagamentoRealizado));
     }
 
     @Test
@@ -284,5 +281,69 @@ public class PedidoServiceTest {
         assertThat(pedidoProdutos.size()).isEqualTo(1);
         assertThat(pedidoProdutos.get(0)).isEqualTo(pedidoProduto);
         verify(pedidoProdutoService, times(1)).retornaPedidoProduto(anyLong());
+    }
+
+    @Test
+    void testaRetornaPedidosClienteSucessoPorCpf(){
+        Cliente cliente = new Cliente();
+        cliente.setIdCliente(1L);
+        BuscaClienteDto dto = new BuscaClienteDto("1234", null, false);
+        List<Pedido> pedidoList = new ArrayList<>();
+        pedidoList.add(pedidoMock);
+        PagamentoDto pagamentoDto = new PagamentoDto(1L,1L,"Teste","Teste",BigDecimal.ZERO,
+                "Criado",null,null,null);
+
+        when(clienteService.buscarClientePorCpf(anyString())).thenReturn(cliente);
+        when(repository.findByIdCliente(anyLong())).thenReturn(pedidoList);
+        when(consumerApiPagamentos.acionaListarPagamentoId(anyLong())).thenReturn(pagamentoDto);
+
+
+        List<PagamentoDto> pagamentoDtos = service.retornaPedidosCliente(dto);
+
+        assertThat(pagamentoDtos.size()).isEqualTo(1);
+    }
+
+    @Test
+    void testaRetornaPedidosClienteSucessoPorNome(){
+        Cliente cliente = new Cliente();
+        cliente.setIdCliente(1L);
+        BuscaClienteDto dto = new BuscaClienteDto(null, "Nome", false);
+        List<Pedido> pedidoList = new ArrayList<>();
+        pedidoList.add(pedidoMock);
+        PagamentoDto pagamentoDto = new PagamentoDto(1L,1L,"Teste","Teste",BigDecimal.ZERO,
+                "Criado",null,null,null);
+
+        when(clienteService.buscarClientePorNome(anyString())).thenReturn(cliente);
+        when(repository.findByIdCliente(anyLong())).thenReturn(pedidoList);
+        when(consumerApiPagamentos.acionaListarPagamentoId(anyLong())).thenReturn(pagamentoDto);
+
+
+        List<PagamentoDto> pagamentoDtos = service.retornaPedidosCliente(dto);
+
+        assertThat(pagamentoDtos.size()).isEqualTo(1);
+    }
+
+    @Test
+    void testaRetornaPedidosClienteNulo(){
+        Cliente cliente = null;
+        BuscaClienteDto dto = new BuscaClienteDto(null, null, false);
+
+        List<PagamentoDto> pagamentoDtos = service.retornaPedidosCliente(dto);
+
+        assertThat(pagamentoDtos).isNull();
+    }
+
+    @Test
+    void testPassarPorExcluir(){
+        PagamentoDto pagamentoDto = new PagamentoDto(1L, 1L, "Teste", "Teste", BigDecimal.ZERO,
+                "Criado", null, null, null);
+        List<PagamentoDto> pagamentos = new ArrayList<>();
+        pagamentos.add(pagamentoDto);
+
+        doNothing().when(consumerApiPagamentos).acionaExcluirPagamento(pagamentos);
+
+        service.excluirPagamentosCliente(pagamentos);
+
+        verify(consumerApiPagamentos, times(1)).acionaExcluirPagamento(pagamentos);
     }
 }

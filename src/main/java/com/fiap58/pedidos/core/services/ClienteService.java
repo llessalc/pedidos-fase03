@@ -1,6 +1,9 @@
 package com.fiap58.pedidos.core.services;
 
+import com.fiap58.pedidos.core.domain.entity.Pedido;
+import com.fiap58.pedidos.core.usecase.IPedidoService;
 import com.fiap58.pedidos.gateway.ClienteRepository;
+import com.fiap58.pedidos.presenters.dto.entrada.BuscaClienteDto;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosClienteCadastro;
 import com.fiap58.pedidos.presenters.dto.entrada.EnderecoCadastro;
 import com.fiap58.pedidos.presenters.dto.entrada.TelefoneCadastro;
@@ -10,9 +13,11 @@ import com.fiap58.pedidos.core.usecase.IClienteService;
 import com.fiap58.pedidos.core.usecase.IEnderecoService;
 import com.fiap58.pedidos.core.usecase.ITelefoneService;
 
+import com.fiap58.pedidos.presenters.dto.saida.DadosClienteExclusaoDto;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,6 +28,7 @@ public class ClienteService implements IClienteService {
     private final IEnderecoService enderecoService;
 
     private final ITelefoneService telefoneService;
+
 
     public ClienteService(ClienteRepository repository, IEnderecoService enderecoService,
             ITelefoneService telefoneService) {
@@ -67,12 +73,12 @@ public class ClienteService implements IClienteService {
 
     @Override
     public Cliente buscarClientePorCpf(String cpf) {
-        return repository.findByCpf(cpf);
+        return verificaClientesAtivos(repository.findByCpf(cpf));
     }
 
     @Override
     public Cliente buscarClientePorId(Long id) {
-        return repository.findById(id).orElse(null);
+        return verificaClientesAtivos(repository.findById(id).orElse(null));
     }
 
     @Override
@@ -81,8 +87,57 @@ public class ClienteService implements IClienteService {
                 .map(DadosClienteDto::new).toList();
     }
 
+    @Override
+    public DadosClienteExclusaoDto excluirCliente(BuscaClienteDto dto) throws Exception {
+        Cliente cliente = new Cliente();
+        if(dto.cpf() != null){
+            cliente = buscarClientePorCpf(dto.cpf());
+        } else if(dto.nome() != null){
+            cliente = buscarClientePorNome(dto.nome());
+        } else {
+            throw new Exception("Alguma informação deve ser fornecida");
+        }
+
+        cliente = verificaClientesAtivos(cliente);
+
+        if(cliente != null && dto.excluirCliente()){
+            cliente.setDeletadoEm(Instant.now());
+            repository.save(cliente);
+            telefoneService.excluirTelefoneCliente(cliente.getIdCliente());
+            enderecoService.excluirEndereco(cliente.getIdCliente());
+            return null;
+        }
+
+        if(cliente != null){
+            List<EnderecoCadastro> enderecos = cliente.getEnderecos().stream().map(EnderecoCadastro::new).toList();
+            List<TelefoneCadastro> telefones = cliente.getTelefones().stream().map(TelefoneCadastro::new).toList();
+
+            // FALTA IMPLEMENTAR para excluir pedidos tbm
+
+            return new DadosClienteExclusaoDto(cliente, enderecos, telefones);
+        }
+
+        return null;
+
+    }
+
+    @Override
+    public Cliente buscarClientePorNome(String nome){return repository.findByNome(nome);}
+
     private DadosClienteDto mapperClienteDto(Cliente cliente) {
-        return new DadosClienteDto(cliente);
+        cliente = verificaClientesAtivos(cliente);
+        if(cliente != null){
+            return new DadosClienteDto(cliente);
+        }
+        return null;
+    }
+
+    private Cliente verificaClientesAtivos(Cliente cliente){
+        if (cliente == null || cliente.getDeletadoEm() != null){
+            return null;
+        } else {
+            return cliente;
+        }
     }
 
 }

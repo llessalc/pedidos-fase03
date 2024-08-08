@@ -9,6 +9,7 @@ import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosDto;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosPainelDto;
 import com.fiap58.pedidos.presenters.dto.saida.ProdutoCarrinhoSaida;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +21,8 @@ public class DadosPedidosPainelDtoTest {
     @BeforeEach
     public void setup() {
         List<ProdutoCarrinhoSaida> produtos = new ArrayList<>();
-        produtos.add(new ProdutoCarrinhoSaida(1l, "Product 1", 1, ""));
-        produtos.add(new ProdutoCarrinhoSaida(2l, "Product 2", 2, ""));
+        produtos.add(new ProdutoCarrinhoSaida(1l, "Product 1", 1, "19.00", ""));
+        produtos.add(new ProdutoCarrinhoSaida(2l, "Product 2", 2, "29.99",""));
 
         DadosPedidosDto dadosPedidosDto = new DadosPedidosDto();
         dadosPedidosDto.setId(1L);

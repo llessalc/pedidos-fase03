@@ -1,9 +1,18 @@
 package com.fiap58.pedidos.controller;
 
+import com.fiap58.pedidos.core.domain.entity.Endereco;
+import com.fiap58.pedidos.core.domain.entity.Pedido;
+import com.fiap58.pedidos.core.domain.entity.Telefone;
 import com.fiap58.pedidos.core.usecase.IClienteService;
+import com.fiap58.pedidos.core.usecase.IEnderecoService;
+import com.fiap58.pedidos.core.usecase.IPedidoService;
+import com.fiap58.pedidos.core.usecase.ITelefoneService;
+import com.fiap58.pedidos.presenters.dto.entrada.BuscaClienteDto;
 import com.fiap58.pedidos.presenters.dto.entrada.DadosClienteCadastro;
+import com.fiap58.pedidos.presenters.dto.entrada.PagamentoDto;
 import com.fiap58.pedidos.presenters.dto.saida.DadosClienteDto;
 
+import com.fiap58.pedidos.presenters.dto.saida.DadosClienteExclusaoDto;
 import io.swagger.v3.oas.annotations.Operation;
 
 import org.springframework.http.HttpStatus;
@@ -18,8 +27,12 @@ public class ClienteController {
 
     private final IClienteService service;
 
-    public ClienteController(IClienteService _service) {
+
+    private final IPedidoService pedidoService;
+
+    public ClienteController(IClienteService _service, IPedidoService pedidoService) {
         this.service = _service;
+        this.pedidoService = pedidoService;
     }
 
     @Operation(description = "Faz a inserção de um novo cliente")
@@ -66,4 +79,25 @@ public class ClienteController {
         }
     }
 
+
+    @PostMapping("/excluir")
+    public ResponseEntity<DadosClienteExclusaoDto> inativarDadosCliente(@RequestBody BuscaClienteDto cliente) throws Exception {
+        List<PagamentoDto> pagamentoDtos = pedidoService.retornaPedidosCliente(cliente);
+        DadosClienteExclusaoDto dadosClienteExclusaoDto;
+
+        if(cliente.excluirCliente()){
+
+            pedidoService.excluirPagamentosCliente(pagamentoDtos);
+            dadosClienteExclusaoDto = service.excluirCliente(cliente);
+
+
+            return ResponseEntity.ok().body(null);
+        }
+        dadosClienteExclusaoDto = service.excluirCliente(cliente);
+        if(dadosClienteExclusaoDto != null) {
+            dadosClienteExclusaoDto.setPagamentoDtos(pagamentoDtos);
+            return ResponseEntity.ok().body(dadosClienteExclusaoDto);
+        }
+        return ResponseEntity.notFound().build();
+    }
 }

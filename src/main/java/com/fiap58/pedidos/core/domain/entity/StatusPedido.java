@@ -4,7 +4,8 @@ public enum StatusPedido {
     RECEBIDO(1,"Recebido"),
     EM_PREPARACAO(2, "Em Preparação"),
     PRONTO(3, "Pronto"),
-    FINALIZADO(4, "Finalizado");
+    FINALIZADO(4, "Finalizado"),
+    CANCELADO(5, "Cancelado");
 
     private final int valor;
     private final String status;
