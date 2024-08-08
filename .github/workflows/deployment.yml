@@ -37,6 +37,7 @@ jobs:
           export PEDIDOS_QUEUE="${{ secrets.PEDIDOS_QUEUE }}"
           export PAGAMENTOS_CONFIRMADOS_QUEUE="${{ secrets.PAGAMENTOS_CONFIRMADOS_QUEUE }}"
           export PAGAMENTOS_CANCELADOS_QUEUE="${{ secrets.PAGAMENTOS_CANCELADOS_QUEUE }}"
+          export AWS_REGION="us-east-1"
           mvn clean
           mvn test -P test
 
@@ -89,6 +90,7 @@ jobs:
           export PEDIDOS_QUEUE="${{ secrets.PEDIDOS_QUEUE }}"
           export PAGAMENTOS_CONFIRMADOS_QUEUE="${{ secrets.PAGAMENTOS_CONFIRMADOS_QUEUE }}"
           export PAGAMENTOS_CANCELADOS_QUEUE="${{ secrets.PAGAMENTOS_CANCELADOS_QUEUE }}"
+          export AWS_REGION="us-east-1"
           mvn package
 
 
