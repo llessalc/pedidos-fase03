@@ -8,9 +8,7 @@ import com.fiap58.pedidos.core.usecase.IProdutoService;
 import com.fiap58.pedidos.gateway.PedidoRepository;
 import com.fiap58.pedidos.gateway.impl.ImplConsumerApiPagamentos;
 import com.fiap58.pedidos.gateway.impl.QueuePublisher;
-import com.fiap58.pedidos.presenters.dto.entrada.DadosClienteCadastro;
-import com.fiap58.pedidos.presenters.dto.entrada.DadosPedidosEntrada;
-import com.fiap58.pedidos.presenters.dto.entrada.ProdutoCarrinho;
+import com.fiap58.pedidos.presenters.dto.entrada.*;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidoPagamento;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosDto;
 import com.fiap58.pedidos.presenters.dto.saida.DadosPedidosPainelDto;
@@ -283,5 +281,69 @@ public class PedidoServiceTest {
         assertThat(pedidoProdutos.size()).isEqualTo(1);
         assertThat(pedidoProdutos.get(0)).isEqualTo(pedidoProduto);
         verify(pedidoProdutoService, times(1)).retornaPedidoProduto(anyLong());
+    }
+
+    @Test
+    void testaRetornaPedidosClienteSucessoPorCpf(){
+        Cliente cliente = new Cliente();
+        cliente.setIdCliente(1L);
+        BuscaClienteDto dto = new BuscaClienteDto("1234", null, false);
+        List<Pedido> pedidoList = new ArrayList<>();
+        pedidoList.add(pedidoMock);
+        PagamentoDto pagamentoDto = new PagamentoDto(1L,1L,"Teste","Teste",BigDecimal.ZERO,
+                "Criado",null,null,null);
+
+        when(clienteService.buscarClientePorCpf(anyString())).thenReturn(cliente);
+        when(repository.findByIdCliente(anyLong())).thenReturn(pedidoList);
+        when(consumerApiPagamentos.acionaListarPagamentoId(anyLong())).thenReturn(pagamentoDto);
+
+
+        List<PagamentoDto> pagamentoDtos = service.retornaPedidosCliente(dto);
+
+        assertThat(pagamentoDtos.size()).isEqualTo(1);
+    }
+
+    @Test
+    void testaRetornaPedidosClienteSucessoPorNome(){
+        Cliente cliente = new Cliente();
+        cliente.setIdCliente(1L);
+        BuscaClienteDto dto = new BuscaClienteDto(null, "Nome", false);
+        List<Pedido> pedidoList = new ArrayList<>();
+        pedidoList.add(pedidoMock);
+        PagamentoDto pagamentoDto = new PagamentoDto(1L,1L,"Teste","Teste",BigDecimal.ZERO,
+                "Criado",null,null,null);
+
+        when(clienteService.buscarClientePorNome(anyString())).thenReturn(cliente);
+        when(repository.findByIdCliente(anyLong())).thenReturn(pedidoList);
+        when(consumerApiPagamentos.acionaListarPagamentoId(anyLong())).thenReturn(pagamentoDto);
+
+
+        List<PagamentoDto> pagamentoDtos = service.retornaPedidosCliente(dto);
+
+        assertThat(pagamentoDtos.size()).isEqualTo(1);
+    }
+
+    @Test
+    void testaRetornaPedidosClienteNulo(){
+        Cliente cliente = null;
+        BuscaClienteDto dto = new BuscaClienteDto(null, null, false);
+
+        List<PagamentoDto> pagamentoDtos = service.retornaPedidosCliente(dto);
+
+        assertThat(pagamentoDtos).isNull();
+    }
+
+    @Test
+    void testPassarPorExcluir(){
+        PagamentoDto pagamentoDto = new PagamentoDto(1L, 1L, "Teste", "Teste", BigDecimal.ZERO,
+                "Criado", null, null, null);
+        List<PagamentoDto> pagamentos = new ArrayList<>();
+        pagamentos.add(pagamentoDto);
+
+        doNothing().when(consumerApiPagamentos).acionaExcluirPagamento(pagamentos);
+
+        service.excluirPagamentosCliente(pagamentos);
+
+        verify(consumerApiPagamentos, times(1)).acionaExcluirPagamento(pagamentos);
     }
 }

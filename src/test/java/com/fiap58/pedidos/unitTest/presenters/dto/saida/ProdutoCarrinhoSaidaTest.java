@@ -23,6 +23,7 @@ public class ProdutoCarrinhoSaidaTest {
         pedidoProduto.setProduto(new Produto(nome, descricao, new BigDecimal("10.0")));
         pedidoProduto.setQuantidade(quantidade);
         pedidoProduto.setObservacao(observacao);
+        pedidoProduto.setPrecoVenda(new BigDecimal("10.0"));
 
         // Act
         ProdutoCarrinhoSaida produtoCarrinhoSaida = new ProdutoCarrinhoSaida(pedidoProduto);
