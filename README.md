@@ -198,6 +198,12 @@ A comunicação entre serviços é realizada através de mensagens assíncronas 
 
 ## 6. Considerações Finais
 
+### Relatório dos processamentos do OWASP ZAP
+
+- [pedido](out/OZAP/2024-08-08-ZAP-Report-Pedidos.html)
+- [pagamento](out/OZAP/2024-08-08-ZAP-Report-Pagamentos.html)
+- [producao](out/OZAP/2024-08-09-ZAP-Report-Producao.html)
+
 ### Benefícios da Implementação
 
 A implementação do padrão Saga permite um gerenciamento robusto de transações distribuídas, garantindo que falhas parciais sejam tratadas de forma eficaz, mantendo a consistência do sistema e melhorando a experiência do usuário.
