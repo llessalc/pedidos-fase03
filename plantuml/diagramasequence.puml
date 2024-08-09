@@ -1,0 +1,19 @@
+@startuml
+actor       user        as user
+queue       Queue       as fila
+database    Database    as basedata
+
+user -> Pedido: 1. Faz Pedido
+Pedido -> fila: 1.1 Envia para checkout
+Pedido -> basedata: 1.2 Informcaoes do Recebido (DB)
+fila -> checkout: 2. Envio do pedido
+checkout -> Pagamento : 3. Inicia Pagamento
+Pagamento -> ServicoExternos: 4. Aguarda Confirmacao
+Pagamento <- ServicoExternos: 4.1 Resposta da Confirmacao
+Pagamento -> basedata: 5. Informcaoes do Pagamento (DB)
+checkout <- Pagamento : 6. Retorno do status com informacoes de pagamento 
+fila <- checkout: 7. Retorno do status com informacoes de pagamento 
+Pedido <- fila: 8. Retorno checkout via fila com informacoes de pagamento. 
+Pedido -> basedata: 9. Informcaoes Recebida com o Pagamento (DB)
+
+@enduml
